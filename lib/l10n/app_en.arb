@@ -1,0 +1,66 @@
+{
+  "@@locale": "en",
+  "appTitle": "Dali Alsham",
+  "appTagline": "Discover places around you",
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "onboardingStart": "Start exploring",
+  "onboardingWelcomeTitle": "Welcome to Dali Alsham",
+  "onboardingWelcomeBody": "Your guide to the best restaurants, cafés and landmarks around you.",
+  "onboardingExploreTitle": "Everything nearby",
+  "onboardingExploreBody": "Restaurants, cafés, hotels, landmarks, pharmacies and banks — filter, search and find what suits you.",
+  "onboardingLocationTitle": "Places on the map",
+  "onboardingLocationBody": "Allow location access to see the closest places and get directions with one tap.",
+  "homeTitle": "Nearby places",
+  "searchHint": "Search places…",
+  "categoryAll": "All",
+  "categoryRestaurant": "Restaurants",
+  "categoryCafe": "Cafés",
+  "categoryShopping": "Shopping",
+  "categoryHealth": "Health",
+  "categoryHotel": "Hotels",
+  "categoryAttraction": "Attractions",
+  "categoryFuel": "Fuel",
+  "categoryBank": "Banks",
+  "locationLoading": "Finding places near you…",
+  "locationPermissionTitle": "Location needed",
+  "locationPermissionMessage": "We use your location to find places around you. Please enable it in system settings.",
+  "locationServiceDisabled": "Location services are turned off. Please enable them in system settings.",
+  "openSettings": "Open settings",
+  "placesEmpty": "No places found nearby",
+  "placesError": "Something went wrong while loading places",
+  "retry": "Retry",
+  "distanceMeters": "{value} m",
+  "@distanceMeters": {
+    "description": "Distance in meters",
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "distanceKilometers": "{value} km",
+  "@distanceKilometers": {
+    "description": "Distance in kilometers",
+    "placeholders": {
+      "value": {
+        "type": "num"
+      }
+    }
+  },
+  "detailsTitle": "Place details",
+  "labelCategory": "Category",
+  "labelDistance": "Distance",
+  "labelAddress": "Address",
+  "labelPhone": "Phone",
+  "labelWebsite": "Website",
+  "labelOpeningHours": "Opening hours",
+  "valueUnknown": "Not available",
+  "getDirections": "Get directions",
+  "call": "Call",
+  "visitWebsite": "Visit website",
+  "unsupportedAction": "This action is not available on this device",
+  "changeLanguage": "العربية",
+  "localeSwitchTooltip": "Switch language",
+  "storiesTitle": "Stories"
+}
