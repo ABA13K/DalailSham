@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../services/domain/entities/service_scope.dart';
+import '../../../services/presentation/pages/services_page.dart';
 import '../../domain/entities/explore_category.dart';
 
 /// Rectangular category card: image background with name and tagline on top.
@@ -18,7 +20,14 @@ class ExploreCategoryCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        onTap: () => context.push('/category-services', extra: category),
+        onTap: () => context.push(
+          '/services',
+          extra: ServicesRouteArgs(
+            scope: ServiceScope.category,
+            id: category.id,
+            title: category.name,
+          ),
+        ),
         child: Stack(
           fit: StackFit.expand,
           children: [

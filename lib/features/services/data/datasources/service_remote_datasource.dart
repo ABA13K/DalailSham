@@ -2,12 +2,14 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/network/api_client.dart';
-import '../../domain/entities/category_service_page.dart';
-import '../models/category_service_model.dart';
+import '../../domain/entities/service_page.dart';
+import '../../domain/entities/service_scope.dart';
+import '../models/service_summary_model.dart';
 
-abstract interface class CategoryServiceRemoteDataSource {
-  Future<CategoryServicePage> fetchServices({
-    required int categoryId,
+abstract interface class ServiceRemoteDataSource {
+  Future<ServicePage> fetchServices({
+    required ServiceScope scope,
+    required int scopeId,
     required String locale,
     required int page,
     double? userLat,
@@ -15,16 +17,16 @@ abstract interface class CategoryServiceRemoteDataSource {
   });
 }
 
-/// Remote data source backed by the Dali Alsham category services API.
-class DalilCategoryServiceRemoteDataSource
-    implements CategoryServiceRemoteDataSource {
-  DalilCategoryServiceRemoteDataSource(this._dio);
+/// Remote data source backed by the Dali Alsham services listings.
+class DalilServiceRemoteDataSource implements ServiceRemoteDataSource {
+  DalilServiceRemoteDataSource(this._dio);
 
   final Dio _dio;
 
   @override
-  Future<CategoryServicePage> fetchServices({
-    required int categoryId,
+  Future<ServicePage> fetchServices({
+    required ServiceScope scope,
+    required int scopeId,
     required String locale,
     required int page,
     double? userLat,
@@ -32,7 +34,7 @@ class DalilCategoryServiceRemoteDataSource
   }) async {
     try {
       final response = await _dio.get<dynamic>(
-        ApiConstants.categoryServicesPath(categoryId),
+        _path(scope, scopeId),
         queryParameters: <String, dynamic>{
           'locale': locale,
           'page': page,
@@ -55,7 +57,7 @@ class DalilCategoryServiceRemoteDataSource
           ? (pagination['next_page'] as num?)?.toInt()
           : null;
 
-      return CategoryServicePage(
+      return ServicePage(
         services: _parseItems(body),
         hasMore: hasMore,
         nextPage: nextPage,
@@ -65,7 +67,12 @@ class DalilCategoryServiceRemoteDataSource
     }
   }
 
-  List<CategoryServiceModel> _parseItems(Object? data) {
+  static String _path(ServiceScope scope, int scopeId) => switch (scope) {
+    ServiceScope.category => '${ApiConstants.categoriesPath}/$scopeId/services',
+    ServiceScope.region => '${ApiConstants.regionsPath}/$scopeId/services',
+  };
+
+  List<ServiceSummaryModel> _parseItems(Object? data) {
     if (data is! Map<String, dynamic>) {
       throw const ParseException('Unexpected services response');
     }
@@ -76,7 +83,7 @@ class DalilCategoryServiceRemoteDataSource
 
     return [
       for (final item in items)
-        if (item is Map<String, dynamic>) CategoryServiceModel.fromJson(item),
+        if (item is Map<String, dynamic>) ServiceSummaryModel.fromJson(item),
     ];
   }
 

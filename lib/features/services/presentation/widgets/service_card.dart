@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/generated/app_localizations.dart';
-import '../../domain/entities/category_service.dart';
+import '../../domain/entities/service_summary.dart';
 
-/// Row summarizing one service inside a category listing.
-class CategoryServiceCard extends StatelessWidget {
-  const CategoryServiceCard({super.key, required this.service});
+/// Row summarizing one service inside a category or region listing.
+class ServiceCard extends StatelessWidget {
+  const ServiceCard({super.key, required this.service});
 
-  final CategoryService service;
+  final ServiceSummary service;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +17,7 @@ class CategoryServiceCard extends StatelessWidget {
     final imageUrl = service.imageUrl;
     final distance = service.distanceText;
     final rating = service.rating.toStringAsFixed(1);
+    final grouping = service.regionName ?? service.categoryName;
 
     return Card(
       child: Padding(
@@ -79,9 +80,9 @@ class CategoryServiceCard extends StatelessWidget {
                     runSpacing: 4,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      if (service.regionName != null)
+                      if (grouping != null)
                         Text(
-                          service.regionName!,
+                          grouping,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: scheme.primary,
                           ),

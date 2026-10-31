@@ -30,8 +30,9 @@ import 'package:dali_alsham/features/regions/domain/entities/region.dart';
 import 'package:dali_alsham/features/regions/domain/entities/region_page.dart';
 import 'package:dali_alsham/features/regions/domain/usecases/get_random_regions.dart';
 import 'package:dali_alsham/features/regions/domain/usecases/get_region_page.dart';
-import 'package:dali_alsham/features/services/domain/entities/category_service_page.dart';
-import 'package:dali_alsham/features/services/domain/usecases/get_category_service_page.dart';
+import 'package:dali_alsham/features/services/domain/entities/service_page.dart';
+import 'package:dali_alsham/features/services/domain/entities/service_scope.dart';
+import 'package:dali_alsham/features/services/domain/usecases/get_service_page.dart';
 import 'package:dali_alsham/features/tutorial/domain/tutorial_repository.dart';
 import 'package:dali_alsham/features/tutorial/presentation/feature_tour.dart';
 import 'package:flutter/material.dart';
@@ -65,8 +66,7 @@ class _MockGetRandomRegions extends Mock implements GetRandomRegions {}
 
 class _MockGetRegionPage extends Mock implements GetRegionPage {}
 
-class _MockGetCategoryServicePage extends Mock
-    implements GetCategoryServicePage {}
+class _MockGetServicePage extends Mock implements GetServicePage {}
 
 class _MockChatRepository extends Mock implements ChatRepository {}
 
@@ -150,9 +150,7 @@ Future<void> _pump(
   getIt.registerSingleton<GetBanners>(_MockGetBanners());
   getIt.registerSingleton<GetRandomRegions>(_MockGetRandomRegions());
   getIt.registerSingleton<GetRegionPage>(_MockGetRegionPage());
-  getIt.registerSingleton<GetCategoryServicePage>(
-    _MockGetCategoryServicePage(),
-  );
+  getIt.registerSingleton<GetServicePage>(_MockGetServicePage());
   getIt.registerSingleton<ChatRepository>(_MockChatRepository());
 
   when(
@@ -207,9 +205,8 @@ Future<void> _pump(
   when(() => getIt<GetRegionPage>().call(any())).thenAnswer(
     (_) async => const Success(RegionPage(regions: [], hasMore: false)),
   );
-  when(() => getIt<GetCategoryServicePage>().call(any())).thenAnswer(
-    (_) async =>
-        const Success(CategoryServicePage(services: [], hasMore: false)),
+  when(() => getIt<GetServicePage>().call(any())).thenAnswer(
+    (_) async => const Success(ServicePage(services: [], hasMore: false)),
   );
   when(
     () => getIt<ChatRepository>().getMessages(
@@ -241,7 +238,11 @@ void main() {
     registerFallbackValue(const RandomRegionsParams(locale: 'en'));
     registerFallbackValue(const RegionPageParams(locale: 'en'));
     registerFallbackValue(
-      const CategoryServicePageParams(categoryId: 1, locale: 'en'),
+      const ServicePageParams(
+        scope: ServiceScope.category,
+        scopeId: 1,
+        locale: 'en',
+      ),
     );
     registerFallbackValue(<String>{});
   });

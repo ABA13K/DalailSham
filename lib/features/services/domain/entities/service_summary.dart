@@ -1,11 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-/// A service (business) published inside a category.
-class CategoryService extends Equatable {
-  const CategoryService({
+/// A business returned by a services listing, whether it was grouped by
+/// category or by region.
+class ServiceSummary extends Equatable {
+  const ServiceSummary({
     required this.id,
     required this.name,
     this.regionName,
+    this.categoryName,
     this.address,
     this.rating = 0,
     this.reviewsCount = 0,
@@ -15,7 +17,13 @@ class CategoryService extends Equatable {
 
   final int id;
   final String name;
+
+  /// Present when the listing did not already come from a region.
   final String? regionName;
+
+  /// Present when the listing did not already come from a category.
+  final String? categoryName;
+
   final String? address;
   final double rating;
   final int reviewsCount;
@@ -30,6 +38,7 @@ class CategoryService extends Equatable {
     id,
     name,
     regionName,
+    categoryName,
     address,
     rating,
     reviewsCount,

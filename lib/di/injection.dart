@@ -35,10 +35,10 @@ import '../features/regions/data/repositories/region_repository_impl.dart';
 import '../features/regions/domain/repositories/region_repository.dart';
 import '../features/regions/domain/usecases/get_random_regions.dart';
 import '../features/regions/domain/usecases/get_region_page.dart';
-import '../features/services/data/datasources/category_service_remote_datasource.dart';
-import '../features/services/data/repositories/category_service_repository_impl.dart';
-import '../features/services/domain/repositories/category_service_repository.dart';
-import '../features/services/domain/usecases/get_category_service_page.dart';
+import '../features/services/data/datasources/service_remote_datasource.dart';
+import '../features/services/data/repositories/service_repository_impl.dart';
+import '../features/services/domain/repositories/service_repository.dart';
+import '../features/services/domain/usecases/get_service_page.dart';
 import '../features/tutorial/data/shared_preferences_tutorial_repository.dart';
 import '../features/tutorial/domain/tutorial_repository.dart';
 
@@ -91,14 +91,14 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton(() => GetRandomRegions(getIt()));
   getIt.registerLazySingleton(() => GetRegionPage(getIt()));
 
-  // Category services feature
-  getIt.registerLazySingleton<CategoryServiceRemoteDataSource>(
-    () => DalilCategoryServiceRemoteDataSource(getIt()),
+  // Services feature (category and region listings)
+  getIt.registerLazySingleton<ServiceRemoteDataSource>(
+    () => DalilServiceRemoteDataSource(getIt()),
   );
-  getIt.registerLazySingleton<CategoryServiceRepository>(
-    () => CategoryServiceRepositoryImpl(getIt()),
+  getIt.registerLazySingleton<ServiceRepository>(
+    () => ServiceRepositoryImpl(getIt()),
   );
-  getIt.registerLazySingleton(() => GetCategoryServicePage(getIt()));
+  getIt.registerLazySingleton(() => GetServicePage(getIt()));
 
   // Chat feature (local demo rooms until the backend ships chat endpoints)
   getIt.registerLazySingleton<ChatRepository>(() => LocalChatRepository());

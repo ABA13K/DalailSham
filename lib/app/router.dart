@@ -3,14 +3,13 @@ import 'package:go_router/go_router.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
 import '../features/onboarding/domain/onboarding_repository.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
-import '../features/categories/domain/entities/explore_category.dart';
 import '../features/categories/presentation/pages/categories_page.dart';
 import '../features/places/domain/entities/place.dart';
 import '../features/places/presentation/pages/home_page.dart';
 import '../features/places/presentation/pages/place_details_page.dart';
 import '../features/places/presentation/pages/stories_page.dart';
 import '../features/regions/presentation/pages/regions_page.dart';
-import '../features/services/presentation/pages/category_services_page.dart';
+import '../features/services/presentation/pages/services_page.dart';
 import 'splash_page.dart';
 
 /// App navigation graph.
@@ -38,15 +37,16 @@ GoRouter createRouter({required OnboardingRepository onboarding}) => GoRouter(
       builder: (context, state) => const RegionsPage(),
     ),
     GoRoute(
-      path: '/category-services',
-      name: 'category-services',
+      path: '/services',
+      name: 'services',
       builder: (context, state) {
-        final category = state.extra;
-        // Deep link without a category payload: go back home.
-        if (category is! ExploreCategory) return const HomePage();
-        return CategoryServicesPage(
-          categoryId: category.id,
-          categoryName: category.name,
+        final args = state.extra;
+        // Deep link without a listing payload: go back home.
+        if (args is! ServicesRouteArgs) return const HomePage();
+        return ServicesPage(
+          scope: args.scope,
+          scopeId: args.id,
+          title: args.title,
         );
       },
     ),

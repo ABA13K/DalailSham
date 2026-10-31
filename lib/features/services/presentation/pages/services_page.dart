@@ -6,20 +6,36 @@ import '../../../../core/widgets/shimmer.dart';
 import '../../../../di/injection.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../location/presentation/location_cubit.dart';
-import '../../domain/usecases/get_category_service_page.dart';
-import '../cubit/category_services_cubit.dart';
-import '../widgets/category_service_card.dart';
+import '../../domain/entities/service_scope.dart';
+import '../../domain/usecases/get_service_page.dart';
+import '../cubit/services_cubit.dart';
+import '../widgets/service_card.dart';
 
-/// The services published inside one category, loaded page by page.
-class CategoryServicesPage extends StatelessWidget {
-  const CategoryServicesPage({
-    super.key,
-    required this.categoryId,
-    required this.categoryName,
+/// Navigation payload for [ServicesPage].
+class ServicesRouteArgs {
+  const ServicesRouteArgs({
+    required this.scope,
+    required this.id,
+    required this.title,
   });
 
-  final int categoryId;
-  final String categoryName;
+  final ServiceScope scope;
+  final int id;
+  final String title;
+}
+
+/// The services published inside one category or region, loaded page by page.
+class ServicesPage extends StatelessWidget {
+  const ServicesPage({
+    super.key,
+    required this.scope,
+    required this.scopeId,
+    required this.title,
+  });
+
+  final ServiceScope scope;
+  final int scopeId;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +45,9 @@ class CategoryServicesPage extends StatelessWidget {
     final userLat = location is LocationReady ? location.latitude : null;
     final userLng = location is LocationReady ? location.longitude : null;
 
-    void fetch(CategoryServicesCubit cubit) => cubit.load(
-      categoryId: categoryId,
+    void fetch(ServicesCubit cubit) => cubit.load(
+      scope: scope,
+      scopeId: scopeId,
       locale: locale,
       userLat: userLat,
       userLng: userLng,
@@ -38,33 +55,29 @@ class CategoryServicesPage extends StatelessWidget {
 
     return BlocProvider(
       create: (_) {
-        final cubit = CategoryServicesCubit(getIt<GetCategoryServicePage>());
+        final cubit = ServicesCubit(getIt<GetServicePage>());
         fetch(cubit);
         return cubit;
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            categoryName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+          title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
         ),
         body: CenteredContent(
-          child: BlocBuilder<CategoryServicesCubit, CategoryServicesState>(
+          child: BlocBuilder<ServicesCubit, ServicesState>(
             builder: (context, state) => switch (state.status) {
-              CategoryServicesStatus.initial ||
-              CategoryServicesStatus.loading => const _ServicesShimmer(),
-              CategoryServicesStatus.failure => _ServicesMessage(
+              ServicesStatus.initial ||
+              ServicesStatus.loading => const _ServicesShimmer(),
+              ServicesStatus.failure => _ServicesMessage(
                 icon: Icons.cloud_off_rounded,
                 message: l10n.placesError,
                 action: FilledButton.icon(
-                  onPressed: () => fetch(context.read<CategoryServicesCubit>()),
+                  onPressed: () => fetch(context.read<ServicesCubit>()),
                   icon: const Icon(Icons.refresh_rounded),
                   label: Text(l10n.retry),
                 ),
               ),
-              CategoryServicesStatus.ready =>
+              ServicesStatus.ready =>
                 state.services.isEmpty
                     ? _ServicesMessage(
                         icon: Icons.storefront_outlined,
@@ -82,7 +95,7 @@ class CategoryServicesPage extends StatelessWidget {
 class _ServicesList extends StatelessWidget {
   const _ServicesList({required this.state});
 
-  final CategoryServicesState state;
+  final ServicesState state;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +109,7 @@ class _ServicesList extends StatelessWidget {
             itemCount: state.services.length,
             itemBuilder: (context, index) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: CategoryServiceCard(service: state.services[index]),
+              child: ServiceCard(service: state.services[index]),
             ),
           ),
         ),
@@ -107,7 +120,7 @@ class _ServicesList extends StatelessWidget {
               child: FilledButton.tonal(
                 onPressed: state.isLoadingMore
                     ? null
-                    : () => context.read<CategoryServicesCubit>().loadMore(),
+                    : () => context.read<ServicesCubit>().loadMore(),
                 child: state.isLoadingMore
                     ? const SizedBox(
                         width: 20,

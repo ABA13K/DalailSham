@@ -38,10 +38,11 @@ import 'package:dali_alsham/features/regions/domain/usecases/get_random_regions.
 import 'package:dali_alsham/features/regions/domain/usecases/get_region_page.dart';
 import 'package:dali_alsham/features/regions/presentation/pages/regions_page.dart';
 import 'package:dali_alsham/features/regions/presentation/widgets/region_rail.dart';
-import 'package:dali_alsham/features/services/domain/entities/category_service.dart';
-import 'package:dali_alsham/features/services/domain/entities/category_service_page.dart';
-import 'package:dali_alsham/features/services/domain/usecases/get_category_service_page.dart';
-import 'package:dali_alsham/features/services/presentation/pages/category_services_page.dart';
+import 'package:dali_alsham/features/services/domain/entities/service_summary.dart';
+import 'package:dali_alsham/features/services/domain/entities/service_page.dart';
+import 'package:dali_alsham/features/services/domain/entities/service_scope.dart';
+import 'package:dali_alsham/features/services/domain/usecases/get_service_page.dart';
+import 'package:dali_alsham/features/services/presentation/pages/services_page.dart';
 import 'package:dali_alsham/features/tutorial/domain/tutorial_repository.dart';
 import 'package:dali_alsham/features/tutorial/presentation/feature_tour.dart';
 import 'package:dali_alsham/l10n/generated/app_localizations.dart';
@@ -76,8 +77,7 @@ class _MockGetRandomRegions extends Mock implements GetRandomRegions {}
 
 class _MockGetRegionPage extends Mock implements GetRegionPage {}
 
-class _MockGetCategoryServicePage extends Mock
-    implements GetCategoryServicePage {}
+class _MockGetServicePage extends Mock implements GetServicePage {}
 
 class _MockChatRepository extends Mock implements ChatRepository {}
 
@@ -101,9 +101,7 @@ Future<void> _pumpSplash(
   getIt.registerSingleton<GetBanners>(_MockGetBanners());
   getIt.registerSingleton<GetRandomRegions>(_MockGetRandomRegions());
   getIt.registerSingleton<GetRegionPage>(_MockGetRegionPage());
-  getIt.registerSingleton<GetCategoryServicePage>(
-    _MockGetCategoryServicePage(),
-  );
+  getIt.registerSingleton<GetServicePage>(_MockGetServicePage());
   getIt.registerSingleton<ChatRepository>(_MockChatRepository());
 
   when(
@@ -158,9 +156,8 @@ Future<void> _pumpSplash(
   when(() => getIt<GetRegionPage>().call(any())).thenAnswer(
     (_) async => const Success(RegionPage(regions: [], hasMore: false)),
   );
-  when(() => getIt<GetCategoryServicePage>().call(any())).thenAnswer(
-    (_) async =>
-        const Success(CategoryServicePage(services: [], hasMore: false)),
+  when(() => getIt<GetServicePage>().call(any())).thenAnswer(
+    (_) async => const Success(ServicePage(services: [], hasMore: false)),
   );
   when(
     () => getIt<ChatRepository>().getMessages(
@@ -220,7 +217,11 @@ void main() {
     registerFallbackValue(const RandomRegionsParams(locale: 'en'));
     registerFallbackValue(const RegionPageParams(locale: 'en'));
     registerFallbackValue(
-      const CategoryServicePageParams(categoryId: 1, locale: 'en'),
+      const ServicePageParams(
+        scope: ServiceScope.category,
+        scopeId: 1,
+        locale: 'en',
+      ),
     );
     registerFallbackValue(<String>{});
   });
@@ -1013,11 +1014,11 @@ void main() {
         ExploreCategory(id: 1, name: 'Shawarma Streets'),
       ]),
     );
-    when(() => getIt<GetCategoryServicePage>().call(any())).thenAnswer(
+    when(() => getIt<GetServicePage>().call(any())).thenAnswer(
       (_) async => const Success(
-        CategoryServicePage(
+        ServicePage(
           services: [
-            CategoryService(
+            ServiceSummary(
               id: 2,
               name: 'Imran',
               regionName: 'Mazzeh',
@@ -1038,7 +1039,7 @@ void main() {
     await tester.tap(find.text('Shawarma Streets'));
     await tester.pumpAndSettle();
 
-    final page = find.byType(CategoryServicesPage);
+    final page = find.byType(ServicesPage);
     expect(page, findsOneWidget);
     expect(
       find.descendant(of: page, matching: find.text('Imran')),
@@ -1058,13 +1059,64 @@ void main() {
     );
 
     final params =
-        verify(
-              () => getIt<GetCategoryServicePage>().call(captureAny()),
-            ).captured.single
-            as CategoryServicePageParams;
-    expect(params.categoryId, 1);
+        verify(() => getIt<GetServicePage>().call(captureAny())).captured.single
+            as ServicePageParams;
+    expect(params.scope, ServiceScope.category);
+    expect(params.scopeId, 1);
     expect(params.userLat, 33.51);
     expect(params.userLng, 36.29);
+  });
+
+  testWidgets('opens the services of a region', (tester) async {
+    await _pumpApp(
+      tester,
+      location: const Success(UserLocation(latitude: 33.51, longitude: 36.29)),
+    );
+
+    when(() => getIt<GetRandomRegions>().call(any())).thenAnswer(
+      (_) async =>
+          const Success<List<Region>>([Region(id: 4, name: 'Barzeh Hills')]),
+    );
+    when(() => getIt<GetServicePage>().call(any())).thenAnswer(
+      (_) async => const Success(
+        ServicePage(
+          services: [
+            ServiceSummary(
+              id: 1,
+              name: 'Al Asad',
+              categoryName: 'Restaurants',
+              address: 'Damascus',
+              rating: 0,
+              reviewsCount: 0,
+            ),
+          ],
+          hasMore: false,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byTooltip('Retry'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Barzeh Hills'));
+    await tester.pumpAndSettle();
+
+    final page = find.byType(ServicesPage);
+    expect(page, findsOneWidget);
+    expect(
+      find.descendant(of: page, matching: find.text('Al Asad')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: page, matching: find.text('Restaurants')),
+      findsOneWidget,
+    );
+
+    final params =
+        verify(() => getIt<GetServicePage>().call(captureAny())).captured.single
+            as ServicePageParams;
+    expect(params.scope, ServiceScope.region);
+    expect(params.scopeId, 4);
   });
 
   testWidgets('shows a demo-data notice when live places are unavailable', (

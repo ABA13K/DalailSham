@@ -11,10 +11,6 @@ class ApiConstants {
   static const String randomCategoriesPath = '$dalilBaseUrl/categories/random';
   static const String categoriesPath = '$dalilBaseUrl/categories';
 
-  /// Services published inside a category.
-  static String categoryServicesPath(int categoryId) =>
-      '$dalilBaseUrl/categories/$categoryId/services';
-
   static const String randomRegionsPath = '$dalilBaseUrl/regions/random';
   static const String regionsPath = '$dalilBaseUrl/regions';
   static const String bannersPath = '$dalilBaseUrl/banners';

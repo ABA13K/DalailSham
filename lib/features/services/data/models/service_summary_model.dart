@@ -1,12 +1,13 @@
 import 'package:dali_alsham/core/network/remote_image.dart';
-import 'package:dali_alsham/features/services/domain/entities/category_service.dart';
+import 'package:dali_alsham/features/services/domain/entities/service_summary.dart';
 
-/// JSON/DTO representation of [CategoryService].
-class CategoryServiceModel extends CategoryService {
-  const CategoryServiceModel({
+/// JSON/DTO representation of [ServiceSummary].
+class ServiceSummaryModel extends ServiceSummary {
+  const ServiceSummaryModel({
     required super.id,
     required super.name,
     super.regionName,
+    super.categoryName,
     super.address,
     super.rating,
     super.reviewsCount,
@@ -14,17 +15,18 @@ class CategoryServiceModel extends CategoryService {
     super.imageUrl,
   });
 
-  factory CategoryServiceModel.fromJson(Map<String, dynamic> json) {
+  factory ServiceSummaryModel.fromJson(Map<String, dynamic> json) {
     final id = json['id'];
     final name = json['name'];
     if (id is! num || name is! String || name.trim().isEmpty) {
       throw const FormatException('Invalid service payload');
     }
 
-    return CategoryServiceModel(
+    return ServiceSummaryModel(
       id: id.toInt(),
       name: name.trim(),
       regionName: _nestedName(json['region']),
+      categoryName: _nestedName(json['category']),
       address: _text(json['address']),
       rating: (json['rating'] as num?)?.toDouble() ?? 0,
       reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? 0,
