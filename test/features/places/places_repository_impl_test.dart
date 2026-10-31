@@ -4,7 +4,7 @@ import 'package:dali_alsham/features/places/data/repositories/places_repository_
 import 'package:dali_alsham/core/error/exceptions.dart';
 import 'package:dali_alsham/core/error/failures.dart';
 import 'package:dali_alsham/core/error/result.dart';
-import 'package:dali_alsham/features/places/domain/entities/place.dart';
+import 'package:dali_alsham/features/places/domain/entities/nearby_places.dart';
 import 'package:dali_alsham/features/places/domain/entities/place_category.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -46,19 +46,22 @@ void main() {
     ).thenAnswer((_) async => nearby);
   });
 
-  test('sorts places by distance from the user', () async {
+  test('sorts live places by distance from the user', () async {
     final result = await repository.getNearbyPlaces(latitude: 0, longitude: 0);
 
     expect(result.isSuccess, isTrue);
-    final places = result.getOrElse((_) => []);
-    expect(places.first.name, 'Near Cafe');
-    expect(places.last.name, 'Far Cafe');
-    expect(places.first.distanceMeters, isNotNull);
-    expect(places.first.distanceMeters! < places.last.distanceMeters!,
-        isTrue);
+    final nearby = result.getOrElse((_) => const NearbyPlaces(places: []));
+    expect(nearby.isDemo, isFalse);
+    expect(nearby.places.first.name, 'Near Cafe');
+    expect(nearby.places.last.name, 'Far Cafe');
+    expect(nearby.places.first.distanceMeters, isNotNull);
+    expect(
+      nearby.places.first.distanceMeters! < nearby.places.last.distanceMeters!,
+      isTrue,
+    );
   });
 
-  test('maps data source exceptions to failures', () async {
+  test('falls back to nearby demo places when the API fails', () async {
     when(
       () => remote.fetchNearbyPlaces(
         latitude: any(named: 'latitude'),
@@ -67,13 +70,44 @@ void main() {
       ),
     ).thenThrow(const NetworkException());
 
+    final result = await repository.getNearbyPlaces(
+      latitude: 33.51,
+      longitude: 36.29,
+    );
+
+    expect(result.isSuccess, isTrue);
+    final nearby = result.getOrElse((_) => const NearbyPlaces(places: []));
+    expect(nearby.isDemo, isTrue);
+    expect(nearby.places, isNotEmpty);
+    expect(nearby.places.first.name, 'Nawfara Cafe');
+    expect(nearby.places.first.address, isNotNull);
+    expect(nearby.places.first.phone, isNull);
+    expect(
+      nearby.places.every((place) => place.distanceMeters != null),
+      isTrue,
+    );
+    expect(
+      nearby.places.first.distanceMeters!,
+      lessThan(nearby.places.last.distanceMeters!),
+    );
+  });
+
+  test('does not mask unexpected errors with demo data', () async {
+    when(
+      () => remote.fetchNearbyPlaces(
+        latitude: any(named: 'latitude'),
+        longitude: any(named: 'longitude'),
+        radiusMeters: any(named: 'radiusMeters'),
+      ),
+    ).thenThrow(StateError('boom'));
+
     final result = await repository.getNearbyPlaces(latitude: 0, longitude: 0);
 
-    expect(result, isA<FailureResult<List<Place>>>());
+    expect(result, isA<FailureResult<NearbyPlaces>>());
     final failure = switch (result) {
-      FailureResult<List<Place>>(:final failure) => failure,
+      FailureResult<NearbyPlaces>(:final failure) => failure,
       _ => throw StateError('expected failure'),
     };
-    expect(failure, isA<NetworkFailure>());
+    expect(failure, isA<UnexpectedFailure>());
   });
 }

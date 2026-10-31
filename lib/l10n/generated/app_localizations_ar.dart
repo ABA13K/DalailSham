@@ -78,7 +78,37 @@ class AppLocalizationsAr extends AppLocalizations {
   String get categoryBank => 'بنوك';
 
   @override
-  String get locationLoading => 'جارٍ البحث عن الأماكن من حولك…';
+  String get exploreCategories => 'تصفح الأقسام';
+
+  @override
+  String get seeAll => 'عرض الكل';
+
+  @override
+  String get loadMore => 'المزيد';
+
+  @override
+  String get categoriesEmpty => 'لا توجد أقسام بعد';
+
+  @override
+  String get exploreRegions => 'تصفح المناطق';
+
+  @override
+  String get regionsEmpty => 'لا توجد مناطق بعد';
+
+  @override
+  String servicesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count خدمة',
+      many: '$count خدمة',
+      few: '$count خدمات',
+      two: 'خدمتان',
+      one: 'خدمة واحدة',
+      zero: 'لا توجد خدمات',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get locationPermissionTitle => 'مطلوب الوصول إلى الموقع';
@@ -114,7 +144,54 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get detailsTitle => 'تفاصيل المكان';
+  String get profileTitle => 'الملف التجاري';
+
+  @override
+  String get sectionAbout => 'نبذة عن المكان';
+
+  @override
+  String get sectionContact => 'التواصل والموقع';
+
+  @override
+  String get sectionAmenities => 'الخدمات والمرافق';
+
+  @override
+  String get sectionReviews => 'التقييمات والمراجعات';
+
+  @override
+  String get labelPrice => 'الفئة السعرية';
+
+  @override
+  String get labelReviews => 'التقييمات';
+
+  @override
+  String get labelSince => 'منذ';
+
+  @override
+  String get statusOpenNow => 'مفتوح الآن';
+
+  @override
+  String get statusClosed => 'مغلق';
+
+  @override
+  String get statusOpen24 => 'مفتوح 24 ساعة';
+
+  @override
+  String get directions => 'الاتجاهات';
+
+  @override
+  String get viewStory => 'شاهد القصة';
+
+  @override
+  String get viewPhoto => 'عرض الصورة';
+
+  @override
+  String get profilePhoto => 'صورة الملف';
+
+  @override
+  String profilePopularFor(String first, String second) {
+    return 'يقصدها الزوار من أجل $first و$second.';
+  }
 
   @override
   String get labelCategory => 'الفئة';
@@ -153,8 +230,99 @@ class AppLocalizationsAr extends AppLocalizations {
   String get changeLanguage => 'English';
 
   @override
-  String get localeSwitchTooltip => 'تغيير اللغة';
+  String get language => 'اللغة';
+
+  @override
+  String get darkMode => 'الوضع الداكن';
+
+  @override
+  String get adLabel => 'إعلان';
+
+  @override
+  String get menuTitle => 'قائمة الطعام';
+
+  @override
+  String get menuSubtitle => 'قائمة تجريبية · الأسعار بالليرة السورية';
+
+  @override
+  String get currencySyp => 'ل.س';
+
+  @override
+  String ratingSummary(String rating, int count) {
+    return 'التقييم $rating من 5 · $count تقييم';
+  }
+
+  @override
+  String get tutorialMenu => 'جولة تعريفية';
+
+  @override
+  String get tutorialStoriesTitle => 'القصص';
+
+  @override
+  String get tutorialStoriesBody =>
+      'اضغط على أي دائرة في الأعلى لعرض الأماكن بملء الشاشة. تتحول القصص المشاهدة إلى رمادي.';
+
+  @override
+  String get tutorialAdsTitle => 'العروض';
+
+  @override
+  String get tutorialAdsBody =>
+      'تتحرك العروض المحلية تلقائياً — اسحب لتصفحها بنفسك.';
+
+  @override
+  String get tutorialSearchTitle => 'البحث والتصفية';
+
+  @override
+  String get tutorialSearchBody =>
+      'ابحث بالاسم، ثم ضيّق النتائج عبر فئات الأزرار في الأسفل.';
+
+  @override
+  String get tutorialMenuTitle => 'القائمة والإعدادات';
+
+  @override
+  String get tutorialMenuBody =>
+      'افتح القائمة لتغيير اللغة أو تفعيل الوضع الداكن أو إعادة هذه الجولة.';
+
+  @override
+  String get tutorialDone => 'فهمت';
 
   @override
   String get storiesTitle => 'القصص';
+
+  @override
+  String get storiesNow => 'الآن';
+
+  @override
+  String get storiesClose => 'إغلاق القصص';
+
+  @override
+  String get viewPlace => 'عرض المكان';
+
+  @override
+  String get demoDataNotice => 'بيانات تجريبية — تعذّر تحميل الأماكن المباشرة.';
+
+  @override
+  String get chat => 'محادثة';
+
+  @override
+  String get chatRoomTitle => 'غرفة النقاش';
+
+  @override
+  String get chatHint => 'اكتب رسالة…';
+
+  @override
+  String get chatSend => 'إرسال';
+
+  @override
+  String get chatEmpty => 'لا توجد رسائل بعد — ابدأ النقاش.';
+
+  @override
+  String get chatError => 'حدث خطأ أثناء تحميل الرسائل';
+
+  @override
+  String get chatDemoNotice =>
+      'محادثة تجريبية — تبقى الرسائل على هذا الجهاز فقط.';
+
+  @override
+  String get servicesEmpty => 'لا توجد خدمات ضمن هذه الفئة بعد';
 }

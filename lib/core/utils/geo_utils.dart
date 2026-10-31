@@ -15,7 +15,8 @@ class GeoUtils {
   }) {
     final dLat = _toRadians(toLat - fromLat);
     final dLon = _toRadians(toLon - fromLon);
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_toRadians(fromLat)) *
             math.cos(_toRadians(toLat)) *
             math.sin(dLon / 2) *

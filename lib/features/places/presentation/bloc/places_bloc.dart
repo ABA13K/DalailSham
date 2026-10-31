@@ -29,11 +29,13 @@ class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
       longitude: event.longitude,
       radiusMeters: event.radiusMeters,
     );
-    emit(state.copyWith(
-      status: PlacesStatus.loading,
-      lastRequest: params,
-      clearFailure: true,
-    ));
+    emit(
+      state.copyWith(
+        status: PlacesStatus.loading,
+        lastRequest: params,
+        clearFailure: true,
+      ),
+    );
     await _load(params, emit);
   }
 
@@ -53,16 +55,21 @@ class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
   ) async {
     final result = await _getNearbyPlaces(params);
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: PlacesStatus.failure,
-        failure: failure,
-      )),
-      (places) => emit(state.copyWith(
-        status: PlacesStatus.success,
-        allPlaces: places,
-        visiblePlaces: _applyFilters(places, state.category, state.query),
-        clearFailure: true,
-      )),
+      (failure) =>
+          emit(state.copyWith(status: PlacesStatus.failure, failure: failure)),
+      (nearby) => emit(
+        state.copyWith(
+          status: PlacesStatus.success,
+          allPlaces: nearby.places,
+          visiblePlaces: _applyFilters(
+            nearby.places,
+            state.category,
+            state.query,
+          ),
+          isDemoData: nearby.isDemo,
+          clearFailure: true,
+        ),
+      ),
     );
   }
 
@@ -70,12 +77,17 @@ class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
     PlaceCategoryFiltered event,
     Emitter<PlacesState> emit,
   ) {
-    emit(state.copyWith(
-      category: event.category,
-      clearCategory: event.category == null,
-      visiblePlaces:
-          _applyFilters(state.allPlaces, event.category, state.query),
-    ));
+    emit(
+      state.copyWith(
+        category: event.category,
+        clearCategory: event.category == null,
+        visiblePlaces: _applyFilters(
+          state.allPlaces,
+          event.category,
+          state.query,
+        ),
+      ),
+    );
   }
 
   void _onQueryChanged(
@@ -83,10 +95,12 @@ class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
     Emitter<PlacesState> emit,
   ) {
     final query = event.query.trim();
-    emit(state.copyWith(
-      query: query,
-      visiblePlaces: _applyFilters(state.allPlaces, state.category, query),
-    ));
+    emit(
+      state.copyWith(
+        query: query,
+        visiblePlaces: _applyFilters(state.allPlaces, state.category, query),
+      ),
+    );
   }
 
   List<Place> _applyFilters(
@@ -99,8 +113,7 @@ class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
       if (category != null && place.category != category) return false;
       if (normalizedQuery.isEmpty) return true;
       return place.name.toLowerCase().contains(normalizedQuery) ||
-          (place.nameAr?.contains(query) ?? false) ||
-          (place.address?.toLowerCase().contains(normalizedQuery) ?? false);
+          (place.nameAr?.contains(query) ?? false);
     }).toList();
   }
 }

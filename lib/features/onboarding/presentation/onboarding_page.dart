@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../domain/onboarding_repository.dart';
 
@@ -93,14 +94,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                  child: _OnboardingCard(
-                    title: slides[_page].title,
-                    body: slides[_page].body,
-                    pageKey: ValueKey(_page),
-                    progress: (_page + 1) / _pageCount,
-                    tooltip:
-                        isLast ? l10n.onboardingStart : l10n.onboardingNext,
-                    onPressed: _finishing ? null : _next,
+                  child: CenteredContent(
+                    maxWidth: 520,
+                    child: _OnboardingCard(
+                      title: slides[_page].title,
+                      body: slides[_page].body,
+                      pageKey: ValueKey(_page),
+                      progress: (_page + 1) / _pageCount,
+                      tooltip: isLast
+                          ? l10n.onboardingStart
+                          : l10n.onboardingNext,
+                      onPressed: _finishing ? null : _next,
+                    ),
                   ),
                 ),
               ],
@@ -137,11 +142,7 @@ class _Background extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0x99031B3D),
-                Color(0x33031B3D),
-                Color(0xCC031226),
-              ],
+              colors: [Color(0x99031B3D), Color(0x33031B3D), Color(0xCC031226)],
               stops: [0, 0.4, 1],
             ),
           ),
@@ -209,13 +210,9 @@ class _OnboardingCard extends StatelessWidget {
                     switchOutCurve: Curves.easeInCubic,
                     layoutBuilder: (currentChild, previousChildren) => Stack(
                       alignment: Alignment.bottomCenter,
-                      children: [
-                        ...previousChildren,
-                        ?currentChild,
-                      ],
+                      children: [...previousChildren, ?currentChild],
                     ),
-                    transitionBuilder: (child, animation) =>
-                        FadeTransition(
+                    transitionBuilder: (child, animation) => FadeTransition(
                       opacity: animation,
                       child: SlideTransition(
                         position: Tween<Offset>(
@@ -311,10 +308,7 @@ class _OnboardingCard extends StatelessWidget {
 
 /// Rounded corners with a smooth S-curve notch cut into the bottom edge.
 class _BottomNotchClipper extends CustomClipper<Path> {
-  const _BottomNotchClipper({
-    this.notchRadius = 52,
-    this.cornerRadius = 28,
-  });
+  const _BottomNotchClipper({this.notchRadius = 52, this.cornerRadius = 28});
 
   final double notchRadius;
   final double cornerRadius;

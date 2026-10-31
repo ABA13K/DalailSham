@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import 'package:dali_alsham/core/error/result.dart';
 import 'package:dali_alsham/core/usecases/usecase.dart';
-import 'package:dali_alsham/features/places/domain/entities/place.dart';
+import 'package:dali_alsham/features/places/domain/entities/nearby_places.dart';
 import 'package:dali_alsham/features/places/domain/repositories/places_repository.dart';
 
 class NearbyPlacesParams extends Equatable {
@@ -21,13 +21,13 @@ class NearbyPlacesParams extends Equatable {
 }
 
 /// Returns places around a point, nearest first.
-class GetNearbyPlaces implements UseCase<List<Place>, NearbyPlacesParams> {
+class GetNearbyPlaces implements UseCase<NearbyPlaces, NearbyPlacesParams> {
   const GetNearbyPlaces(this._repository);
 
   final PlacesRepository _repository;
 
   @override
-  Future<Result<List<Place>>> call(NearbyPlacesParams params) {
+  Future<Result<NearbyPlaces>> call(NearbyPlacesParams params) {
     return _repository.getNearbyPlaces(
       latitude: params.latitude,
       longitude: params.longitude,

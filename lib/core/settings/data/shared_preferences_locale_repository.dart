@@ -13,5 +13,6 @@ class SharedPreferencesLocaleRepository implements LocaleRepository {
   Future<String?> getLocaleCode() async => _prefs.getString(_key);
 
   @override
-  Future<void> saveLocaleCode(String code) async => _prefs.setString(_key, code);
+  Future<void> saveLocaleCode(String code) async =>
+      _prefs.setString(_key, code);
 }

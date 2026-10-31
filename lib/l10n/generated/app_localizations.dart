@@ -230,11 +230,47 @@ abstract class AppLocalizations {
   /// **'Banks'**
   String get categoryBank;
 
-  /// No description provided for @locationLoading.
+  /// No description provided for @exploreCategories.
   ///
   /// In en, this message translates to:
-  /// **'Finding places near you…'**
-  String get locationLoading;
+  /// **'Explore categories'**
+  String get exploreCategories;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get loadMore;
+
+  /// No description provided for @categoriesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet'**
+  String get categoriesEmpty;
+
+  /// No description provided for @exploreRegions.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore regions'**
+  String get exploreRegions;
+
+  /// No description provided for @regionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No regions yet'**
+  String get regionsEmpty;
+
+  /// Number of services published in a region
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} service} other{{count} services}}'**
+  String servicesCount(int count);
 
   /// No description provided for @locationPermissionTitle.
   ///
@@ -290,11 +326,101 @@ abstract class AppLocalizations {
   /// **'{value} km'**
   String distanceKilometers(num value);
 
-  /// No description provided for @detailsTitle.
+  /// No description provided for @profileTitle.
   ///
   /// In en, this message translates to:
-  /// **'Place details'**
-  String get detailsTitle;
+  /// **'Business profile'**
+  String get profileTitle;
+
+  /// No description provided for @sectionAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get sectionAbout;
+
+  /// No description provided for @sectionContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact & location'**
+  String get sectionContact;
+
+  /// No description provided for @sectionAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Services & amenities'**
+  String get sectionAmenities;
+
+  /// No description provided for @sectionReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings & reviews'**
+  String get sectionReviews;
+
+  /// No description provided for @labelPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get labelPrice;
+
+  /// No description provided for @labelReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get labelReviews;
+
+  /// No description provided for @labelSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Since'**
+  String get labelSince;
+
+  /// No description provided for @statusOpenNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now'**
+  String get statusOpenNow;
+
+  /// No description provided for @statusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get statusClosed;
+
+  /// No description provided for @statusOpen24.
+  ///
+  /// In en, this message translates to:
+  /// **'Open 24 hours'**
+  String get statusOpen24;
+
+  /// No description provided for @directions.
+  ///
+  /// In en, this message translates to:
+  /// **'Directions'**
+  String get directions;
+
+  /// No description provided for @viewStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch story'**
+  String get viewStory;
+
+  /// No description provided for @viewPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Show photo'**
+  String get viewPhoto;
+
+  /// No description provided for @profilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get profilePhoto;
+
+  /// No description provided for @profilePopularFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Locals come here for {first} and {second}.'**
+  String profilePopularFor(String first, String second);
 
   /// No description provided for @labelCategory.
   ///
@@ -368,17 +494,185 @@ abstract class AppLocalizations {
   /// **'العربية'**
   String get changeLanguage;
 
-  /// No description provided for @localeSwitchTooltip.
+  /// No description provided for @language.
   ///
   /// In en, this message translates to:
-  /// **'Switch language'**
-  String get localeSwitchTooltip;
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get darkMode;
+
+  /// No description provided for @adLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad'**
+  String get adLabel;
+
+  /// No description provided for @menuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menuTitle;
+
+  /// No description provided for @menuSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample menu · prices in Syrian pounds'**
+  String get menuSubtitle;
+
+  /// No description provided for @currencySyp.
+  ///
+  /// In en, this message translates to:
+  /// **'SYP'**
+  String get currencySyp;
+
+  /// No description provided for @ratingSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Rated {rating} out of 5 · {count} reviews'**
+  String ratingSummary(String rating, int count);
+
+  /// No description provided for @tutorialMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'App tutorial'**
+  String get tutorialMenu;
+
+  /// No description provided for @tutorialStoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories'**
+  String get tutorialStoriesTitle;
+
+  /// No description provided for @tutorialStoriesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap any circle at the top to preview places full-screen. Watched stories turn grey.'**
+  String get tutorialStoriesBody;
+
+  /// No description provided for @tutorialAdsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers'**
+  String get tutorialAdsTitle;
+
+  /// No description provided for @tutorialAdsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Local offers scroll automatically — swipe to browse them yourself.'**
+  String get tutorialAdsBody;
+
+  /// No description provided for @tutorialSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search & filters'**
+  String get tutorialSearchTitle;
+
+  /// No description provided for @tutorialSearchBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, then narrow the results with the category chips below.'**
+  String get tutorialSearchBody;
+
+  /// No description provided for @tutorialMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu & settings'**
+  String get tutorialMenuTitle;
+
+  /// No description provided for @tutorialMenuBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the menu to switch language, enable dark mode, or replay this tour.'**
+  String get tutorialMenuBody;
+
+  /// No description provided for @tutorialDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get tutorialDone;
 
   /// No description provided for @storiesTitle.
   ///
   /// In en, this message translates to:
   /// **'Stories'**
   String get storiesTitle;
+
+  /// No description provided for @storiesNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get storiesNow;
+
+  /// No description provided for @storiesClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close stories'**
+  String get storiesClose;
+
+  /// No description provided for @viewPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'View place'**
+  String get viewPlace;
+
+  /// No description provided for @demoDataNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo data — live places are unavailable.'**
+  String get demoDataNotice;
+
+  /// No description provided for @chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chat;
+
+  /// No description provided for @chatRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat room'**
+  String get chatRoomTitle;
+
+  /// No description provided for @chatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a message…'**
+  String get chatHint;
+
+  /// No description provided for @chatSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get chatSend;
+
+  /// No description provided for @chatEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet — start the conversation.'**
+  String get chatEmpty;
+
+  /// No description provided for @chatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong while loading messages'**
+  String get chatError;
+
+  /// No description provided for @chatDemoNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo chat — messages stay on this device only.'**
+  String get chatDemoNotice;
+
+  /// No description provided for @servicesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No services in this category yet'**
+  String get servicesEmpty;
 }
 
 class _AppLocalizationsDelegate

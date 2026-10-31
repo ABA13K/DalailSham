@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/theme/app_theme.dart';
 import '../features/onboarding/domain/onboarding_repository.dart';
-import '../l10n/generated/app_localizations.dart';
 
-/// Branded launch screen shown on cold start; hands off to onboarding or home.
+/// Animated logo launch screen; hands off to onboarding or home.
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key, required this.onboarding});
 
-  static const duration = Duration(milliseconds: 1800);
+  static const duration = Duration(milliseconds: 2200);
 
   final OnboardingRepository onboarding;
 
@@ -19,46 +18,66 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: SplashPage.duration,
-  )
-    ..addStatusListener(_handleStatus)
-    ..forward();
+  late final AnimationController _controller =
+      AnimationController(vsync: this, duration: SplashPage.duration)
+        ..addStatusListener(_handleStatus)
+        ..forward();
 
-  late final Animation<double> _markFade = CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0, 0.35, curve: Curves.easeOut),
-  );
+  late final Animation<double> _circleOpacity = Tween<double>(begin: 0, end: 1)
+      .animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0, 0.4, curve: Curves.easeIn),
+        ),
+      );
 
-  late final Animation<double> _markScale = Tween<double>(begin: 0.86, end: 1)
-      .animate(CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0, 0.55, curve: Curves.easeOutBack),
-  ));
+  late final Animation<double> _circleScale = Tween<double>(begin: 0.3, end: 1)
+      .animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0, 0.55, curve: Curves.easeOutBack),
+        ),
+      );
 
-  late final Animation<double> _halo = CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0, 0.8, curve: Curves.easeOutCubic),
-  );
+  late final Animation<double> _circleRotation =
+      Tween<double>(begin: -0.25, end: 0).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0, 0.55, curve: Curves.easeOutCubic),
+        ),
+      );
 
-  late final Animation<double> _textFade = CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0.2, 0.65, curve: Curves.easeOutCubic),
-  );
+  late final Animation<double> _towerOpacity = Tween<double>(begin: 0, end: 1)
+      .animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0.25, 0.6, curve: Curves.easeIn),
+        ),
+      );
+
+  late final Animation<Offset> _towerSlide =
+      Tween<Offset>(begin: const Offset(0, 0.35), end: Offset.zero).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0.25, 0.75, curve: Curves.easeOutCubic),
+        ),
+      );
+
+  late final Animation<double> _textOpacity = Tween<double>(begin: 0, end: 1)
+      .animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0.6, 1, curve: Curves.easeIn),
+        ),
+      );
 
   late final Animation<Offset> _textSlide =
-      Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero).animate(
-    CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.2, 0.65, curve: Curves.easeOutCubic),
-    ),
-  );
-
-  late final Animation<double> _progress = CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0.15, 0.95, curve: Curves.easeInOut),
-  );
+      Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0.6, 1, curve: Curves.easeOutCubic),
+        ),
+      );
 
   void _handleStatus(AnimationStatus status) {
     if (status != AnimationStatus.completed) return;
@@ -81,204 +100,75 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
-    return Scaffold(
-      backgroundColor: AppTheme.brand,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppTheme.brand, AppTheme.brandDeep],
-          ),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            const _Glow(
-              alignment: Alignment(-1.1, -0.9),
-              size: 340,
-              color: Color(0x1FFFFFFF),
-            ),
-            const _Glow(
-              alignment: Alignment(1.2, 0.9),
-              size: 400,
-              color: Color(0x33001F1A),
-            ),
-            SafeArea(
-              child: Column(
-                children: [
-                  const Spacer(flex: 3),
-                  FadeTransition(
-                    opacity: _markFade,
-                    child: ScaleTransition(
-                      scale: _markScale,
-                      child: _SplashMark(halo: _halo),
-                    ),
-                  ),
-                  const SizedBox(height: 36),
-                  SlideTransition(
-                    position: _textSlide,
-                    child: FadeTransition(
-                      opacity: _textFade,
-                      child: Column(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      key: const ValueKey('splash-logo'),
+                      width: 280,
+                      height: 320,
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          Text(
-                            l10n.appTitle,
-                            textAlign: TextAlign.center,
-                            style: textTheme.displaySmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1,
+                          Positioned(
+                            top: 65,
+                            child: FadeTransition(
+                              opacity: _circleOpacity,
+                              child: ScaleTransition(
+                                scale: _circleScale,
+                                child: RotationTransition(
+                                  turns: _circleRotation,
+                                  child: Image.asset(
+                                    'assets/images/circle.png',
+                                    width: 190,
+                                    height: 190,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            l10n.appTagline,
-                            textAlign: TextAlign.center,
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.72),
-                              letterSpacing: 0.4,
+                          SlideTransition(
+                            position: _towerSlide,
+                            child: FadeTransition(
+                              opacity: _towerOpacity,
+                              child: Image.asset(
+                                'assets/images/tower.png',
+                                width: 240,
+                                height: 310,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  const Spacer(flex: 4),
-                  FadeTransition(
-                    opacity: _textFade,
-                    child: _ProgressBar(progress: _progress),
-                  ),
-                  const SizedBox(height: 44),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SplashMark extends StatelessWidget {
-  const _SplashMark({required this.halo});
-
-  final Animation<double> halo;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 200,
-      height: 200,
-      child: AnimatedBuilder(
-        animation: halo,
-        builder: (context, _) {
-          final t = halo.value;
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 132 + 60 * t,
-                height: 132 + 60 * t,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.22 * (1 - t)),
-                    width: 1.5,
-                  ),
-                ),
-              ),
-              Container(
-                width: 116,
-                height: 116,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(36),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.28),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 28,
-                      offset: Offset(0, 14),
+                    const SizedBox(height: 12),
+                    SlideTransition(
+                      position: _textSlide,
+                      child: FadeTransition(
+                        opacity: _textOpacity,
+                        child: Image.asset(
+                          'assets/images/text.png',
+                          width: 340,
+                          height: 165,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.explore_rounded,
-                  size: 58,
-                  color: Colors.white,
-                ),
               ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _ProgressBar extends StatelessWidget {
-  const _ProgressBar({required this.progress});
-
-  final Animation<double> progress;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: progress,
-      builder: (context, _) => ClipRRect(
-        borderRadius: BorderRadius.circular(99),
-        child: SizedBox(
-          width: 128,
-          height: 3,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              ColoredBox(color: Colors.white.withValues(alpha: 0.18)),
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: FractionallySizedBox(
-                  widthFactor: progress.value.clamp(0.0, 1.0),
-                  heightFactor: 1,
-                  child: const ColoredBox(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Glow extends StatelessWidget {
-  const _Glow({
-    required this.alignment,
-    required this.size,
-    required this.color,
-  });
-
-  final Alignment alignment;
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: alignment,
-      child: IgnorePointer(
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [color, color.withValues(alpha: 0)],
             ),
           ),
         ),

@@ -42,30 +42,30 @@ class PlaceModel extends Place {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'nameAr': nameAr,
-        'category': category.name,
-        'lat': latitude,
-        'lon': longitude,
-        'address': address,
-        'phone': phone,
-        'website': website,
-        'openingHours': openingHours,
-        'distanceMeters': distanceMeters,
-      };
+    'id': id,
+    'name': name,
+    'nameAr': nameAr,
+    'category': category.name,
+    'lat': latitude,
+    'lon': longitude,
+    'address': address,
+    'phone': phone,
+    'website': website,
+    'openingHours': openingHours,
+    'distanceMeters': distanceMeters,
+  };
 
   PlaceModel copyWithDistance(int meters) => PlaceModel(
-        id: id,
-        name: name,
-        nameAr: nameAr,
-        category: category,
-        latitude: latitude,
-        longitude: longitude,
-        address: address,
-        phone: phone,
-        website: website,
-        openingHours: openingHours,
-        distanceMeters: meters,
-      );
+    id: id,
+    name: name,
+    nameAr: nameAr,
+    category: category,
+    latitude: latitude,
+    longitude: longitude,
+    address: address,
+    phone: phone,
+    website: website,
+    openingHours: openingHours,
+    distanceMeters: meters,
+  );
 }

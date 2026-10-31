@@ -29,11 +29,13 @@ class ParseException extends AppException {
 }
 
 class LocationPermissionException extends AppException {
-  const LocationPermissionException(
-      [super.message = 'Location permission denied']);
+  const LocationPermissionException([
+    super.message = 'Location permission denied',
+  ]);
 }
 
 class LocationServiceDisabledException extends AppException {
-  const LocationServiceDisabledException(
-      [super.message = 'Location services are disabled']);
+  const LocationServiceDisabledException([
+    super.message = 'Location services are disabled',
+  ]);
 }

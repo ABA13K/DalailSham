@@ -33,13 +33,15 @@ class ParsingFailure extends Failure {
 }
 
 class LocationPermissionFailure extends Failure {
-  const LocationPermissionFailure(
-      [super.message = 'Location permission denied']);
+  const LocationPermissionFailure([
+    super.message = 'Location permission denied',
+  ]);
 }
 
 class LocationServiceDisabledFailure extends Failure {
-  const LocationServiceDisabledFailure(
-      [super.message = 'Location services are disabled']);
+  const LocationServiceDisabledFailure([
+    super.message = 'Location services are disabled',
+  ]);
 }
 
 class UnexpectedFailure extends Failure {
@@ -56,8 +58,9 @@ Failure failureFromException(Object error) {
       CacheException() => CacheFailure(error.message),
       ParseException() => ParsingFailure(error.message),
       LocationPermissionException() => LocationPermissionFailure(error.message),
-      LocationServiceDisabledException() =>
-        LocationServiceDisabledFailure(error.message),
+      LocationServiceDisabledException() => LocationServiceDisabledFailure(
+        error.message,
+      ),
     };
   }
   return UnexpectedFailure(error.toString());

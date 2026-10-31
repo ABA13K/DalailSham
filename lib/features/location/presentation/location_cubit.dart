@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/error/failures.dart';
 import '../../../core/usecases/usecase.dart';
 import '../domain/usecases/get_current_location.dart';
+import '../domain/usecases/has_location_access.dart';
 
 sealed class LocationState extends Equatable {
   const LocationState();
@@ -41,9 +42,11 @@ class LocationFailureState extends LocationState {
 
 /// Resolves the user's current position for the places feed.
 class LocationCubit extends Cubit<LocationState> {
-  LocationCubit(this._getCurrentLocation) : super(const LocationInitial());
+  LocationCubit(this._getCurrentLocation, this._hasLocationAccess)
+    : super(const LocationInitial());
 
   final GetCurrentLocation _getCurrentLocation;
+  final HasLocationAccess _hasLocationAccess;
 
   Future<void> locate() async {
     emit(const LocationLoading());
@@ -52,5 +55,15 @@ class LocationCubit extends Cubit<LocationState> {
       (failure) => emit(LocationFailureState(failure)),
       (location) => emit(LocationReady(location.latitude, location.longitude)),
     );
+  }
+
+  /// Re-resolves the position after the app returns to the foreground, but
+  /// only when access was granted outside the app (e.g. system settings), so
+  /// the user is not prompted again just for switching apps.
+  Future<void> retryIfAccessGranted() async {
+    if (state is! LocationFailureState) return;
+    if (!await _hasLocationAccess()) return;
+    if (isClosed) return;
+    await locate();
   }
 }

@@ -11,6 +11,7 @@ class PlacesState extends Equatable {
     this.query = '',
     this.failure,
     this.lastRequest,
+    this.isDemoData = false,
   });
 
   final PlacesStatus status;
@@ -28,6 +29,9 @@ class PlacesState extends Equatable {
   /// Coordinates of the last request, used for refresh.
   final NearbyPlacesParams? lastRequest;
 
+  /// True when [allPlaces] is offline sample data.
+  final bool isDemoData;
+
   bool get hasFilters => category != null || query.isNotEmpty;
 
   PlacesState copyWith({
@@ -38,6 +42,7 @@ class PlacesState extends Equatable {
     String? query,
     Failure? failure,
     NearbyPlacesParams? lastRequest,
+    bool? isDemoData,
     bool clearCategory = false,
     bool clearFailure = false,
   }) {
@@ -49,17 +54,19 @@ class PlacesState extends Equatable {
       query: query ?? this.query,
       failure: clearFailure ? null : (failure ?? this.failure),
       lastRequest: lastRequest ?? this.lastRequest,
+      isDemoData: isDemoData ?? this.isDemoData,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        allPlaces,
-        visiblePlaces,
-        category,
-        query,
-        failure,
-        lastRequest,
-      ];
+    status,
+    allPlaces,
+    visiblePlaces,
+    category,
+    query,
+    failure,
+    lastRequest,
+    isDemoData,
+  ];
 }

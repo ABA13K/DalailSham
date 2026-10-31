@@ -22,7 +22,21 @@
   "categoryAttraction": "Attractions",
   "categoryFuel": "Fuel",
   "categoryBank": "Banks",
-  "locationLoading": "Finding places near you…",
+  "exploreCategories": "Explore categories",
+  "seeAll": "See all",
+  "loadMore": "Load more",
+  "categoriesEmpty": "No categories yet",
+  "exploreRegions": "Explore regions",
+  "regionsEmpty": "No regions yet",
+  "servicesCount": "{count, plural, =1{{count} service} other{{count} services}}",
+  "@servicesCount": {
+    "description": "Number of services published in a region",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "locationPermissionTitle": "Location needed",
   "locationPermissionMessage": "We use your location to find places around you. Please enable it in system settings.",
   "locationServiceDisabled": "Location services are turned off. Please enable them in system settings.",
@@ -48,7 +62,32 @@
       }
     }
   },
-  "detailsTitle": "Place details",
+  "profileTitle": "Business profile",
+  "sectionAbout": "About",
+  "sectionContact": "Contact & location",
+  "sectionAmenities": "Services & amenities",
+  "sectionReviews": "Ratings & reviews",
+  "labelPrice": "Price",
+  "labelReviews": "Reviews",
+  "labelSince": "Since",
+  "statusOpenNow": "Open now",
+  "statusClosed": "Closed",
+  "statusOpen24": "Open 24 hours",
+  "directions": "Directions",
+  "viewStory": "Watch story",
+  "viewPhoto": "Show photo",
+  "profilePhoto": "Profile photo",
+  "profilePopularFor": "Locals come here for {first} and {second}.",
+  "@profilePopularFor": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
   "labelCategory": "Category",
   "labelDistance": "Distance",
   "labelAddress": "Address",
@@ -61,6 +100,44 @@
   "visitWebsite": "Visit website",
   "unsupportedAction": "This action is not available on this device",
   "changeLanguage": "العربية",
-  "localeSwitchTooltip": "Switch language",
-  "storiesTitle": "Stories"
+  "language": "Language",
+  "darkMode": "Dark mode",
+  "adLabel": "Ad",
+  "menuTitle": "Menu",
+  "menuSubtitle": "Sample menu · prices in Syrian pounds",
+  "currencySyp": "SYP",
+  "ratingSummary": "Rated {rating} out of 5 · {count} reviews",
+  "@ratingSummary": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tutorialMenu": "App tutorial",
+  "tutorialStoriesTitle": "Stories",
+  "tutorialStoriesBody": "Tap any circle at the top to preview places full-screen. Watched stories turn grey.",
+  "tutorialAdsTitle": "Offers",
+  "tutorialAdsBody": "Local offers scroll automatically — swipe to browse them yourself.",
+  "tutorialSearchTitle": "Search & filters",
+  "tutorialSearchBody": "Search by name, then narrow the results with the category chips below.",
+  "tutorialMenuTitle": "Menu & settings",
+  "tutorialMenuBody": "Open the menu to switch language, enable dark mode, or replay this tour.",
+  "tutorialDone": "Got it",
+  "storiesTitle": "Stories",
+  "storiesNow": "Now",
+  "storiesClose": "Close stories",
+  "viewPlace": "View place",
+  "demoDataNotice": "Demo data — live places are unavailable.",
+  "chat": "Chat",
+  "chatRoomTitle": "Chat room",
+  "chatHint": "Write a message…",
+  "chatSend": "Send",
+  "chatEmpty": "No messages yet — start the conversation.",
+  "chatError": "Something went wrong while loading messages",
+  "chatDemoNotice": "Demo chat — messages stay on this device only.",
+  "servicesEmpty": "No services in this category yet"
 }

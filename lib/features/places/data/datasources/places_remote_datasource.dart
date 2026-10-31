@@ -46,11 +46,11 @@ class OverpassPlacesRemoteDataSource implements PlacesRemoteDataSource {
     return switch (error.type) {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout =>
-        const TimeoutException(),
+      DioExceptionType.receiveTimeout => const TimeoutException(),
       DioExceptionType.connectionError => const NetworkException(),
-      DioExceptionType.badResponse =>
-        ServerException('HTTP ${error.response?.statusCode}'),
+      DioExceptionType.badResponse => ServerException(
+        'HTTP ${error.response?.statusCode}',
+      ),
       _ => ServerException(error.message ?? 'Request failed'),
     };
   }

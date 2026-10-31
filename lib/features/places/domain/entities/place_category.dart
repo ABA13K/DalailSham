@@ -18,11 +18,17 @@ enum PlaceCategory {
   }) {
     if (amenity != null) {
       return switch (amenity) {
-        'restaurant' || 'fast_food' || 'bar' || 'pub' || 'food_court' =>
-          PlaceCategory.restaurant,
+        'restaurant' ||
+        'fast_food' ||
+        'bar' ||
+        'pub' ||
+        'food_court' => PlaceCategory.restaurant,
         'cafe' || 'ice_cream' => PlaceCategory.cafe,
-        'pharmacy' || 'hospital' || 'doctors' || 'clinic' || 'dentist' =>
-          PlaceCategory.health,
+        'pharmacy' ||
+        'hospital' ||
+        'doctors' ||
+        'clinic' ||
+        'dentist' => PlaceCategory.health,
         'fuel' || 'charging_station' => PlaceCategory.fuel,
         'bank' || 'atm' || 'bureau_de_change' => PlaceCategory.bank,
         _ => PlaceCategory.other,
@@ -31,11 +37,18 @@ enum PlaceCategory {
     if (shop != null) return PlaceCategory.shopping;
     if (tourism != null) {
       return switch (tourism) {
-        'hotel' || 'hostel' || 'guest_house' || 'motel' || 'apartment' =>
-          PlaceCategory.hotel,
-        'attraction' || 'museum' || 'artwork' || 'gallery' || 'viewpoint' ||
-        'theme_park' || 'zoo' =>
-          PlaceCategory.attraction,
+        'hotel' ||
+        'hostel' ||
+        'guest_house' ||
+        'motel' ||
+        'apartment' => PlaceCategory.hotel,
+        'attraction' ||
+        'museum' ||
+        'artwork' ||
+        'gallery' ||
+        'viewpoint' ||
+        'theme_park' ||
+        'zoo' => PlaceCategory.attraction,
         _ => PlaceCategory.other,
       };
     }

@@ -5,4 +5,8 @@ abstract interface class LocationRepository {
   /// Returns the current position, or a failure when permission is denied
   /// or location services are disabled.
   Future<Result<UserLocation>> getCurrentLocation();
+
+  /// Whether services and permission currently allow access, without
+  /// showing a permission prompt.
+  Future<bool> hasLocationAccess();
 }

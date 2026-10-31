@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/place.dart';
-import '../../domain/entities/place_category.dart';
 import 'category_info.dart';
 
 /// Horizontal "stories" strip highlighting the nearest places.
@@ -10,13 +9,18 @@ class PlaceStoriesBar extends StatelessWidget {
   const PlaceStoriesBar({
     super.key,
     required this.places,
-    required this.onPlaceTap,
+    required this.viewedIds,
+    required this.onStoryTap,
   });
 
   final List<Place> places;
-  final ValueChanged<Place> onPlaceTap;
 
-  static const _maxStories = 12;
+  /// Ids of already-watched stories; their rings are shown in grey.
+  final Set<String> viewedIds;
+
+  final void Function(Place place, int index) onStoryTap;
+
+  static const maxStories = 12;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,12 @@ class PlaceStoriesBar extends StatelessWidget {
 
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final stories = places.take(_maxStories);
+    final stories = places.take(maxStories).toList();
+    final labelStyle = theme.textTheme.labelSmall;
+    final labelHeight =
+        MediaQuery.textScalerOf(context).scale(labelStyle?.fontSize ?? 11) *
+        (labelStyle?.height ?? 1.45);
+    final itemHeight = 66 + 6 + labelHeight + 6;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,28 +48,36 @@ class PlaceStoriesBar extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 88,
+          height: itemHeight,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: stories.length,
             separatorBuilder: (_, _) => const SizedBox(width: 14),
             itemBuilder: (context, index) {
-              final place = stories.elementAt(index);
-              return _StoryItem(place: place, onTap: () => onPlaceTap(place));
+              final place = stories[index];
+              return _StoryItem(
+                place: place,
+                viewed: viewedIds.contains(place.id),
+                onTap: () => onStoryTap(place, index),
+              );
             },
           ),
         ),
-        const SizedBox(height: 4),
       ],
     );
   }
 }
 
 class _StoryItem extends StatelessWidget {
-  const _StoryItem({required this.place, required this.onTap});
+  const _StoryItem({
+    required this.place,
+    required this.viewed,
+    required this.onTap,
+  });
 
   final Place place;
+  final bool viewed;
   final VoidCallback onTap;
 
   @override
@@ -70,6 +87,22 @@ class _StoryItem extends StatelessWidget {
       Localizations.localeOf(context).languageCode,
     );
 
+    final ring = viewed
+        ? const LinearGradient(
+            colors: [Color(0xFFBDBDBD), Color(0xFF8A8A8A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
+        : SweepGradient(
+            startAngle: -1.2,
+            endAngle: 4.4,
+            colors: [
+              theme.colorScheme.primary,
+              theme.colorScheme.tertiary,
+              theme.colorScheme.primary,
+            ],
+          );
+
     return SizedBox(
       width: 80,
       child: InkWell(
@@ -78,21 +111,11 @@ class _StoryItem extends StatelessWidget {
         child: Column(
           children: [
             Container(
+              key: ValueKey('story-ring-${place.id}'),
               width: 66,
               height: 66,
               padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: SweepGradient(
-                  startAngle: -1.2,
-                  endAngle: 4.4,
-                  colors: [
-                    theme.colorScheme.primary,
-                    theme.colorScheme.tertiary,
-                    theme.colorScheme.primary,
-                  ],
-                ),
-              ),
+              decoration: BoxDecoration(shape: BoxShape.circle, gradient: ring),
               child: Container(
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
@@ -102,7 +125,7 @@ class _StoryItem extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: _gradientFor(place.category),
+                    gradient: CategoryInfo.gradient(place.category),
                   ),
                   child: Center(
                     child: Icon(
@@ -125,38 +148,6 @@ class _StoryItem extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  static LinearGradient _gradientFor(PlaceCategory category) {
-    final colors = switch (category) {
-      PlaceCategory.restaurant => [
-        const Color(0xFFFF7043),
-        const Color(0xFFD84315),
-      ],
-      PlaceCategory.cafe => [const Color(0xFFA1887F), const Color(0xFF5D4037)],
-      PlaceCategory.shopping => [
-        const Color(0xFFAB47BC),
-        const Color(0xFF6A1B9A),
-      ],
-      PlaceCategory.health => [
-        const Color(0xFF26A69A),
-        const Color(0xFF00695C),
-      ],
-      PlaceCategory.hotel => [const Color(0xFF42A5F5), const Color(0xFF1565C0)],
-      PlaceCategory.attraction => [
-        const Color(0xFFFFB300),
-        const Color(0xFFEF6C00),
-      ],
-      PlaceCategory.fuel => [const Color(0xFF78909C), const Color(0xFF37474F)],
-      PlaceCategory.bank => [const Color(0xFF66BB6A), const Color(0xFF2E7D32)],
-      PlaceCategory.other => [const Color(0xFF0D6EFD), const Color(0xFF052A63)],
-    };
-
-    return LinearGradient(
-      colors: colors,
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
     );
   }
 }

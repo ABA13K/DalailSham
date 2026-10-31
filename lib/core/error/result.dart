@@ -6,7 +6,10 @@ sealed class Result<T> {
 
   bool get isSuccess => this is Success<T>;
 
-  R fold<R>(R Function(Failure failure) onFailure, R Function(T value) onSuccess) => switch (this) {
+  R fold<R>(
+    R Function(Failure failure) onFailure,
+    R Function(T value) onSuccess,
+  ) => switch (this) {
     Success<T>(:final value) => onSuccess(value),
     FailureResult<T>(:final failure) => onFailure(failure),
   };

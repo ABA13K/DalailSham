@@ -4,6 +4,7 @@ import '../../../../core/utils/distance_formatter.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/place.dart';
 import 'category_info.dart';
+import 'rating_badge.dart';
 
 /// Compact card summarizing a single place in the feed.
 class PlaceCard extends StatelessWidget {
@@ -28,8 +29,9 @@ class PlaceCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundColor:
-                    theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                backgroundColor: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.7,
+                ),
                 child: Icon(
                   CategoryInfo.icon(place.category),
                   color: theme.colorScheme.onPrimaryContainer,
@@ -47,11 +49,21 @@ class PlaceCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      CategoryInfo.label(l10n, place.category),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                      ),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          CategoryInfo.label(l10n, place.category),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        RatingBadge(place: place),
+                      ],
                     ),
                     if (place.address != null) ...[
                       const SizedBox(height: 4),
@@ -70,8 +82,10 @@ class PlaceCard extends StatelessWidget {
               if (distance != null) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(8),
