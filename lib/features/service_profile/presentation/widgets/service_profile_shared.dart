@@ -31,7 +31,7 @@ class ServiceSectionHeader extends StatelessWidget {
             ),
           ),
         ),
-        if (trailing != null) trailing!,
+        ?trailing,
       ],
     );
   }
