@@ -41,6 +41,7 @@ class ServiceReviewSummary extends Equatable {
 class ServiceReview extends Equatable {
   const ServiceReview({
     required this.rating,
+    this.id,
     this.comment,
     this.isMine = false,
     this.userName,
@@ -49,6 +50,10 @@ class ServiceReview extends Equatable {
   });
 
   final int rating;
+
+  /// Server identifier of the review; needed by signed-in actions
+  /// such as editing or deleting the reader's own review.
+  final int? id;
   final String? comment;
 
   /// Only the signed-in variant can say the review is the reader's own.
@@ -60,6 +65,7 @@ class ServiceReview extends Equatable {
   @override
   List<Object?> get props => [
     rating,
+    id,
     comment,
     isMine,
     userName,

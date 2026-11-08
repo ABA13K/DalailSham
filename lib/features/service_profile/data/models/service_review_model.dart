@@ -5,6 +5,7 @@ import 'package:dali_alsham/features/service_profile/domain/entities/service_rev
 class ServiceReviewModel extends ServiceReview {
   const ServiceReviewModel({
     required super.rating,
+    super.id,
     super.comment,
     super.isMine,
     super.userName,
@@ -17,6 +18,7 @@ class ServiceReviewModel extends ServiceReview {
     final createdAt = json['created_at'];
     return ServiceReviewModel(
       rating: ((json['rating'] as num?)?.toInt() ?? 0).clamp(0, 5),
+      id: (json['id'] as num?)?.toInt(),
       comment: _text(json['comment']),
       isMine: json['is_mine'] == true,
       userName: user is Map<String, dynamic> ? _text(user['name']) : null,
