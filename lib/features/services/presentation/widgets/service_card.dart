@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../domain/entities/service_summary.dart';
 
-/// Row summarizing one service inside a category or region listing.
+/// Row summarizing one service inside a category, region or favorites listing.
 class ServiceCard extends StatelessWidget {
   const ServiceCard({super.key, required this.service});
 
@@ -149,6 +150,8 @@ class ServiceCard extends StatelessWidget {
                 ),
               ),
             ],
+            const SizedBox(width: 4),
+            FavoriteButton(service: service),
           ],
         ),
       ),

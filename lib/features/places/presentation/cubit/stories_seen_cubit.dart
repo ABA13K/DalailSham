@@ -2,7 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/repositories/stories_seen_repository.dart';
 
-/// Place-story ids the user has watched, kept in sync with local storage.
+/// Ids of the stories the user has watched, kept in sync with local storage.
+/// Both strips write here, so a service story is keyed apart from a place one
+/// with `Story.seenKey`.
 class StoriesSeenCubit extends Cubit<Set<String>> {
   StoriesSeenCubit(this._repository) : super(const {});
 

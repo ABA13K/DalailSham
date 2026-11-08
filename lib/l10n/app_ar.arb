@@ -41,19 +41,13 @@
   "locationPermissionMessage": "نستخدم موقعك للعثور على الأماكن من حولك. يرجى تفعيل الإذن من إعدادات النظام.",
   "locationServiceDisabled": "خدمات الموقع معطلة. يرجى تفعيلها من إعدادات النظام.",
   "openSettings": "فتح الإعدادات",
-  "placesEmpty": "لا توجد أماكن قريبة",
   "placesError": "حدث خطأ أثناء تحميل الأماكن",
   "retry": "إعادة المحاولة",
   "distanceMeters": "{value} م",
   "distanceKilometers": "{value} كم",
   "profileTitle": "الملف التجاري",
-  "sectionAbout": "نبذة عن المكان",
   "sectionContact": "التواصل والموقع",
-  "sectionAmenities": "الخدمات والمرافق",
-  "sectionReviews": "التقييمات والمراجعات",
-  "labelPrice": "الفئة السعرية",
   "labelReviews": "التقييمات",
-  "labelSince": "منذ",
   "statusOpenNow": "مفتوح الآن",
   "statusClosed": "مغلق",
   "statusOpen24": "مفتوح 24 ساعة",
@@ -61,7 +55,6 @@
   "viewStory": "شاهد القصة",
   "viewPhoto": "عرض الصورة",
   "profilePhoto": "صورة الملف",
-  "profilePopularFor": "يقصدها الزوار من أجل {first} و{second}.",
   "labelCategory": "الفئة",
   "labelDistance": "المسافة",
   "labelAddress": "العنوان",
@@ -77,8 +70,6 @@
   "language": "اللغة",
   "darkMode": "الوضع الداكن",
   "adLabel": "إعلان",
-  "menuTitle": "قائمة الطعام",
-  "menuSubtitle": "قائمة تجريبية · الأسعار بالليرة السورية",
   "currencySyp": "ل.س",
   "ratingSummary": "التقييم {rating} من 5 · {count} تقييم",
   "tutorialMenu": "جولة تعريفية",
@@ -87,7 +78,7 @@
   "tutorialAdsTitle": "العروض",
   "tutorialAdsBody": "تتحرك العروض المحلية تلقائياً — اسحب لتصفحها بنفسك.",
   "tutorialSearchTitle": "البحث والتصفية",
-  "tutorialSearchBody": "ابحث بالاسم، ثم ضيّق النتائج عبر فئات الأزرار في الأسفل.",
+  "tutorialSearchBody": "اكتب لتضييق الخدمات في الأسفل حسب الاسم أو الفئة أو المنطقة، ثم اضغط البحث للتصفّح في الدليل بالكامل.",
   "tutorialMenuTitle": "القائمة والإعدادات",
   "tutorialMenuBody": "افتح القائمة لتغيير اللغة أو تفعيل الوضع الداكن أو إعادة هذه الجولة.",
   "tutorialDone": "فهمت",
@@ -95,13 +86,324 @@
   "storiesNow": "الآن",
   "storiesClose": "إغلاق القصص",
   "viewPlace": "عرض المكان",
-  "demoDataNotice": "بيانات تجريبية — تعذّر تحميل الأماكن المباشرة.",
   "chat": "محادثة",
   "chatRoomTitle": "غرفة النقاش",
   "chatHint": "اكتب رسالة…",
   "chatSend": "إرسال",
   "chatEmpty": "لا توجد رسائل بعد — ابدأ النقاش.",
   "chatError": "حدث خطأ أثناء تحميل الرسائل",
-  "chatDemoNotice": "محادثة تجريبية — تبقى الرسائل على هذا الجهاز فقط.",
-  "servicesEmpty": "لا توجد خدمات ضمن هذه الفئة بعد"
+  "chatLocalNotice": "تبقى الرسائل على هذا الجهاز فقط — المحادثة غير متصلة بعد.",
+  "servicesEmpty": "لا توجد خدمات هنا بعد",
+  "servicesError": "حدث خطأ أثناء تحميل الخدمات",
+  "topRatedTitle": "الأعلى تقييماً بين الخدمات",
+  "nearbyTitle": "الأقرب إليك",
+  "nearbyRandomTitle": "مختارة لك",
+  "favoritesTitle": "المفضلة",
+  "favoritesEmpty": "لا توجد عناصر في المفضلة بعد — اضغط على القلب بجانب أي خدمة لإضافتها هنا.",
+  "favoritesNeedLogin": "المفضلة تحتاج حساباً. سجّل الدخول ثم أعد المحاولة.",
+  "addToFavorites": "إضافة إلى المفضلة",
+  "removeFromFavorites": "إزالة من المفضلة",
+  "addedToFavorites": "أُضيفت إلى المفضلة",
+  "removedFromFavorites": "أُزيلت من المفضلة",
+  "favoritesError": "تعذّر تحديث المفضلة",
+  "accountTitle": "الحساب",
+  "loginTitle": "تسجيل الدخول",
+  "registerTitle": "إنشاء حساب",
+  "loginFieldLabel": "البريد الإلكتروني أو رقم الجوال",
+  "passwordLabel": "كلمة المرور",
+  "confirmPasswordLabel": "تأكيد كلمة المرور",
+  "fullNameLabel": "الاسم الكامل",
+  "mobileLabel": "رقم الجوال",
+  "emailLabel": "البريد الإلكتروني (اختياري)",
+  "addressLabel": "العنوان (اختياري)",
+  "genderLabel": "الجنس",
+  "genderMale": "ذكر",
+  "genderFemale": "أنثى",
+  "signIn": "دخول",
+  "showPassword": "إظهار كلمة المرور",
+  "hidePassword": "إخفاء كلمة المرور",
+  "noAccount": "لا تملك حساباً بعد؟",
+  "haveAccount": "لديك حساب بالفعل؟",
+  "fieldRequired": "مطلوب",
+  "passwordTooShort": "استخدم 6 أحرف على الأقل",
+  "passwordMismatch": "كلمتا المرور غير متطابقتين",
+  "genderRequired": "اختر الجنس",
+  "loggedIn": "تم تسجيل الدخول بنجاح",
+  "accountCreated": "تم إنشاء الحساب بنجاح",
+  "signedOut": "تم تسجيل الخروج",
+  "logout": "تسجيل الخروج",
+  "accountProfileTitle": "الملف الشخصي",
+  "profileSaved": "تم تحديث الملف الشخصي بنجاح",
+  "saveChanges": "حفظ التغييرات",
+  "changePhoto": "تغيير الصورة",
+  "removePhoto": "إزالة الصورة",
+  "photoPickFailed": "تعذّر اختيار الصورة",
+  "changePasswordTitle": "تغيير كلمة المرور",
+  "currentPasswordLabel": "كلمة المرور الحالية",
+  "newPasswordLabel": "كلمة المرور الجديدة",
+  "passwordChanged": "تم تغيير كلمة المرور بنجاح",
+  "deleteAccountTitle": "حذف الحساب",
+  "deleteAccountWarning": "سيؤدي هذا إلى حذف حسابك نهائيًا. أدخل كلمة المرور للتأكيد.",
+  "accountDeleted": "تم حذف الحساب",
+  "cancel": "إلغاء",
+  "vendorServiceTitle": "خدمي",
+  "vendorServiceSaved": "تم تحديث بيانات الخدمة بنجاح",
+  "removeMainImage": "حذف الصورة الرئيسية",
+  "nameArabicLabel": "الاسم (بالعربية)",
+  "nameEnglishLabel": "الاسم (بالإنجليزية)",
+  "addressArabicLabel": "العنوان (بالعربية)",
+  "addressEnglishLabel": "العنوان (بالإنجليزية)",
+  "descriptionArabicLabel": "الوصف (بالعربية)",
+  "descriptionEnglishLabel": "الوصف (بالإنجليزية)",
+  "mapsUrlLabel": "رابط خرائط جوجل",
+  "latitudeLabel": "خط العرض",
+  "longitudeLabel": "خط الطول",
+  "invalidUrl": "أدخل رابطًا يبدأ بـ http أو https",
+  "invalidLatitude": "يجب أن يكون خط العرض بين -90 و 90",
+  "invalidLongitude": "يجب أن يكون خط الطول بين -180 و 180",
+  "tooLong": "هذا النص طويل جدًا",
+  "labelRating": "التقييم",
+  "labelVisits": "الزيارات",
+  "labelPlan": "الاشتراك",
+  "labelFlag": "الخدمة",
+  "mainServiceFlag": "الرئيسية",
+  "searchEmpty": "لا يوجد ما يطابق هذا البحث",
+  "vendorJoinTitle": "أدرج خدمتك",
+  "joinIntro": "عرّف عن نفسك وعن خدمتك. تظهر الخدمة بعد مراجعتها من الإدارة.",
+  "joinAccountSection": "الحساب",
+  "joinServiceSection": "الخدمة",
+  "labelRegion": "المنطقة",
+  "chooseRegion": "اختر المنطقة",
+  "chooseCategory": "اختر الفئة",
+  "regionRequired": "اختر المنطقة التي تقع فيها خدمتك",
+  "categoryRequired": "اختر الفئة المناسبة لخدمتك",
+  "companyEmailLabel": "البريد الإلكتروني للشركة (اختياري)",
+  "addCoverPhoto": "إضافة صورة غلاف",
+  "sendRequest": "إرسال الطلب",
+  "joinRequestSubmitted": "تم إرسال الطلب، ستراجعه الإدارة",
+  "vendorContactsTitle": "جهات الاتصال",
+  "contactsIntro": "الأرقام والبريد والروابط التي يصل العملاء من خلالها إلى خدمتك.",
+  "contactsEmpty": "لا توجد جهات اتصال بعد",
+  "addContact": "أضف جهة اتصال",
+  "editContact": "تعديل جهة الاتصال",
+  "chooseContactType": "اختر النوع",
+  "labelContactType": "النوع",
+  "labelContactValue": "القيمة",
+  "contactTypeRequired": "اختر نوع جهة الاتصال",
+  "contactValueRequired": "أدخل الرقم أو العنوان أو الرابط",
+  "saveContact": "حفظ",
+  "contactSaved": "تم حفظ جهة الاتصال",
+  "primaryContact": "الرئيسية",
+  "setPrimaryContact": "اجعلها جهة الاتصال الرئيسية",
+  "deleteContact": "حذف",
+  "deleteContactQuestion": "حذف جهة الاتصال هذه؟",
+  "vendorImagesTitle": "صور الخدمة",
+  "imagesIntro": "الصور التي تظهر تحت خدمتك، بعد موافقة الإدارة عليها.",
+  "imagesLimit": "{count} من {max}",
+  "@imagesLimit": {
+    "description": "Photos a vendor has published against the limit they may hold",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesEmpty": "لا توجد صور بعد",
+  "addImage": "إضافة صورة",
+  "imagePendingApproval": "بانتظار الموافقة",
+  "deleteImage": "حذف الصورة",
+  "deleteImageQuestion": "حذف هذه الصورة؟",
+  "deleteAllImages": "حذف كل الصور",
+  "deleteAllImagesQuestion": "حذف كل صور هذه الخدمة؟",
+  "imagesRemovedAll": "تم حذف {count} صورة",
+  "@imagesRemovedAll": {
+    "description": "How many photos the delete-all endpoint answered it removed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesLimitReached": "لا توجد مساحة لصورة أخرى",
+  "searchPrompt": "اكتب للبحث في الخدمات المدرجة",
+  "filterCategory": "الفئة",
+  "filterRegion": "المنطقة",
+  "filterSort": "الترتيب",
+  "filterRating": "التقييم",
+  "sortLatest": "الأحدث",
+  "sortTopRated": "الأعلى تقييماً",
+  "sortNearest": "الأقرب",
+  "ratingAny": "أي تقييم",
+  "clearFilters": "مسح الفلاتر",
+  "vendorProductsTitle": "المنتجات",
+  "productsIntro": "كل ما تبيعه خدمتك. المنتج الجديد أو المعدّل ينتظر موافقة الإدارة قبل أن يراه العملاء.",
+  "productsSearchHint": "ابحث في المنتجات…",
+  "productsEmpty": "لا توجد منتجات بعد",
+  "addProduct": "إضافة منتج",
+  "editProduct": "تعديل منتج",
+  "deleteProduct": "حذف المنتج",
+  "deleteProductQuestion": "هل تريد حذف هذا المنتج؟",
+  "productSaved": "تم حفظ المنتج",
+  "productDeleted": "تم حذف المنتج",
+  "productPendingApproval": "بانتظار الموافقة",
+  "productHidden": "مخفي",
+  "productUnavailable": "غير متوفر",
+  "priceLabel": "السعر (ل.س)",
+  "quantityLabel": "الكمية",
+  "activeLabel": "ظاهر للزبائن",
+  "availableLabel": "متوفر في المخزون",
+  "productCategoryRequired": "اختر الفئة التي ينتمي إليها المنتج",
+  "filterStatus": "الحالة",
+  "statusAny": "كل الحالات",
+  "statusPending": "قيد المراجعة",
+  "statusApproved": "معتمدة",
+  "statusRejected": "مرفوضة",
+  "invalidPrice": "أدخل سعرًا بين 0 و 9999999.99",
+  "invalidQuantity": "أدخل عددًا صحيحًا حتى 999999",
+  "vendorAmenitiesTitle": "ميزات الخدمة",
+  "amenitiesIntro": "ما تقدمه خدمتك إضافةً إلى ما تبيعه. الميزة الجديدة أو المعدّلة تنتظر موافقة الإدارة قبل أن يراها العملاء.",
+  "amenitiesLimit": "{count} من {max}",
+  "@amenitiesLimit": {
+    "description": "Amenities a vendor has published against the limit they may hold",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "amenitiesEmpty": "لا توجد ميزات بعد",
+  "addAmenity": "إضافة ميزة",
+  "editAmenity": "تعديل ميزة",
+  "deleteAmenity": "حذف الميزة",
+  "deleteAmenityQuestion": "هل تريد حذف هذه الميزة؟",
+  "deleteAllAmenities": "حذف كل الميزات",
+  "deleteAllAmenitiesQuestion": "هل تريد حذف كل ميزات هذه الخدمة؟",
+  "amenitiesRemovedAll": "تم حذف {count} ميزة",
+  "@amenitiesRemovedAll": {
+    "description": "How many amenities the delete-all endpoint answered it removed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "amenitiesLimitReached": "لا مجال لميزة أخرى",
+  "amenityPendingApproval": "بانتظار الموافقة",
+  "amenityWaitsForApproval": "تصل الميزة إلى العملاء بعد موافقة الإدارة.",
+  "amenitySaved": "تم حفظ الميزة",
+  "amenityDeleted": "تم حذف الميزة",
+  "vendorStoriesTitle": "أضف قصة",
+  "storyTypeTitle": "نوع القصة",
+  "storyTypeImage": "صورة",
+  "storyTypeVideo": "فيديو",
+  "storyTypePoll": "تصويت",
+  "storyCaptionArabicLabel": "النص (بالعربية)",
+  "storyCaptionEnglishLabel": "النص (بالإنكليزية)",
+  "storyPickPhoto": "اختر صورة",
+  "storyPickVideo": "اختر فيديو",
+  "storyPhotoRequired": "اختر الصورة التي تعرضها القصة",
+  "storyVideoRequired": "اختر الفيديو الذي تعرضه القصة",
+  "storyQuestionArabicLabel": "السؤال (بالعربية)",
+  "storyQuestionEnglishLabel": "السؤال (بالإنكليزية)",
+  "storyOptionsLabel": "خيارات التصويت",
+  "storyOptionLabel": "الخيار {number}",
+  "@storyOptionLabel": {
+    "description": "Label of one poll option field, counted from the first row",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "storyAddOption": "أضف خياراً",
+  "storyRemoveOption": "إزالة هذا الخيار",
+  "storyOptionsTooFew": "التصويت يحتاج خيارين على الأقل",
+  "storyPublish": "نشر القصة",
+  "storySaved": "تم إنشاء القصة، بانتظار موافقة الإدارة",
+  "storyWaitsForApproval": "تصل القصة إلى العملاء بعد موافقة الإدارة.",
+  "storyExpiresIn": "تنتهي خلال {hours} ساعة",
+  "storyNoVotes": "لا توجد أصوات بعد",
+  "storyVoteHint": "اضغط على إجابة لتُصوّت",
+  "storyVoteFailed": "لم يُسجَّل تصويتك",
+  "serviceStoriesAll": "عرض كل قصص هذه الخدمة",
+  "serviceStoriesEmpty": "لا توجد قصص لهذه الخدمة حالياً",
+  "cityTitle": "دمشق",
+  "mainCategories": "الفئات الرئيسية",
+  "filtersTitle": "الفلاتر",
+  "notificationsEmpty": "لا يوجد جديد حالياً",
+  "notificationsTitle": "الإشعارات",
+  "navHome": "الرئيسية",
+  "navCategories": "الفئات",
+  "navMenu": "القائمة",
+  "serviceProfileTitle": "ملف الخدمة",
+  "sectionAbout": "نبذة",
+  "sectionPhotos": "الصور",
+  "photosCount": "{count, plural, =1{صورة واحدة} other{{count} صور}}",
+  "@photosCount": {
+    "description": "How many pictures a service published",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "galleryPosition": "{current} من {total}",
+  "@galleryPosition": {
+    "description": "Which picture of the set the viewer is showing",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "galleryError": "حدث خطأ أثناء تحميل الصور",
+  "sectionMenu": "قائمة المنتجات",
+  "menuError": "حدث خطأ أثناء تحميل المنتجات",
+  "productsCount": "{count, plural, =1{صنف واحد} other{{count} أصناف}}",
+  "@productsCount": {
+    "description": "How many products a menu or one of its categories holds",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "outOfStock": "غير متوفر",
+  "sectionReviews": "التقييمات والتعليقات",
+  "reviewsEmpty": "لا توجد تقييمات بعد",
+  "reviewsError": "حدث خطأ أثناء تحميل التقييمات",
+  "reviewsCount": "{count, plural, =1{تقييم واحد} other{{count} تقييمات}}",
+  "@reviewsCount": {
+    "description": "How many opinions a service collected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortHighest": "الأعلى تقييماً",
+  "sortLowest": "الأقل تقييماً",
+  "reviewMine": "تقييمك",
+  "reviewAnonymous": "زائر",
+  "sectionHours": "ساعات العمل",
+  "hoursToday": "اليوم",
+  "sectionAmenities": "المرافق والخدمات",
+  "visitsCount": "{count, plural, =1{زيارة واحدة} other{{count} زيارات}}",
+  "@visitsCount": {
+    "description": "How many times readers opened this service",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

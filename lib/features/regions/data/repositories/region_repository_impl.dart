@@ -16,9 +16,7 @@ class RegionRepositoryImpl implements RegionRepository {
     int limit = 8,
   }) async {
     try {
-      final random = await _remoteDataSource.fetchRandomRegions(
-        locale: locale,
-      );
+      final random = await _remoteDataSource.fetchRandomRegions(locale: locale);
       return Success(random.take(limit).toList());
     } catch (error) {
       return FailureResult(failureFromException(error));

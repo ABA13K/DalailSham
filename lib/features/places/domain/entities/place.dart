@@ -32,21 +32,6 @@ class Place extends Equatable {
   /// Distance from the user, filled in by the repository.
   final int? distanceMeters;
 
-  /// Demo rating between 3.8 and 4.9, stable per place until ratings are
-  /// provided by the API.
-  double get rating => 3.8 + (_ratingSeed % 12) / 10;
-
-  /// Demo number of reviews backing [rating].
-  int get ratingCount => 40 + (_ratingSeed ~/ 3) % 900;
-
-  int get _ratingSeed {
-    var hash = 0;
-    for (final unit in id.codeUnits) {
-      hash = (hash * 31 + unit) & 0x7fffffff;
-    }
-    return hash;
-  }
-
   /// Best display name for the given locale code (`ar` / `en`).
   String displayNameFor(String languageCode) {
     if (languageCode == 'ar' && (nameAr?.isNotEmpty ?? false)) {

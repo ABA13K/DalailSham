@@ -11,20 +11,13 @@ import 'package:mocktail/mocktail.dart';
 
 class _MockGetNearbyPlaces extends Mock implements GetNearbyPlaces {}
 
-Place _place(
-  String id,
-  String name,
-  PlaceCategory category, {
-  String? nameAr,
-  String? address,
-}) => Place(
+Place _place(String id, String name, {String? nameAr}) => Place(
   id: id,
   name: name,
   nameAr: nameAr,
-  category: category,
+  category: PlaceCategory.restaurant,
   latitude: 0,
   longitude: 0,
-  address: address,
 );
 
 void main() {
@@ -35,9 +28,9 @@ void main() {
   });
 
   final places = [
-    _place('node/1', 'Olivia Restaurant', PlaceCategory.restaurant),
-    _place('node/2', 'كافيه الشام', PlaceCategory.cafe, nameAr: 'كافيه الشام'),
-    _place('node/3', 'City Mall', PlaceCategory.shopping),
+    _place('node/1', 'Olivia Restaurant'),
+    _place('node/2', 'كافيه الشام', nameAr: 'كافيه الشام'),
+    _place('node/3', 'City Mall'),
   ];
 
   const params = NearbyPlacesParams(latitude: 10, longitude: 20);
@@ -59,29 +52,6 @@ void main() {
           .having((s) => s.lastRequest, 'lastRequest', params),
       isA<PlacesState>()
           .having((s) => s.status, 'status', PlacesStatus.success)
-          .having((s) => s.allPlaces, 'allPlaces', places)
-          .having((s) => s.visiblePlaces, 'visiblePlaces', places),
-    ],
-  );
-
-  blocTest<PlacesBloc, PlacesState>(
-    'flags the state when the use case falls back to demo data',
-    build: () {
-      when(() => usecase(any())).thenAnswer(
-        (_) async => Success(NearbyPlaces(places: places, isDemo: true)),
-      );
-      return PlacesBloc(usecase);
-    },
-    act: (bloc) => bloc.add(const PlacesRequested(latitude: 10, longitude: 20)),
-    expect: () => [
-      isA<PlacesState>().having(
-        (s) => s.status,
-        'status',
-        PlacesStatus.loading,
-      ),
-      isA<PlacesState>()
-          .having((s) => s.status, 'status', PlacesStatus.success)
-          .having((s) => s.isDemoData, 'isDemoData', isTrue)
           .having((s) => s.allPlaces, 'allPlaces', places),
     ],
   );
@@ -108,85 +78,31 @@ void main() {
   );
 
   blocTest<PlacesBloc, PlacesState>(
-    'filters by category without refetching',
+    'a refresh reads the coordinates of the last request',
     build: () => PlacesBloc(usecase),
-    seed: () => const PlacesState(
-      status: PlacesStatus.success,
-      allPlaces: [],
-      visiblePlaces: [],
-    ),
-    act: (bloc) => bloc.add(const PlaceCategoryFiltered(PlaceCategory.cafe)),
-    expect: () => [
-      isA<PlacesState>()
-          .having((s) => s.category, 'category', PlaceCategory.cafe)
-          .having((s) => s.visiblePlaces, 'visiblePlaces', []),
-    ],
-    verify: (_) => verifyNever(() => usecase(any())),
-  );
-
-  blocTest<PlacesBloc, PlacesState>(
-    'filters by search query (case-insensitive on latin names)',
-    build: () => PlacesBloc(usecase),
-    seed: () => PlacesState(
-      status: PlacesStatus.success,
-      allPlaces: places,
-      visiblePlaces: places,
-    ),
-    act: (bloc) => bloc.add(const PlaceSearchQueryChanged('mall')),
-    expect: () => [
-      isA<PlacesState>().having((s) => s.query, 'query', 'mall').having(
-        (s) => s.visiblePlaces.map((p) => p.id).toList(),
-        'visible ids',
-        ['node/3'],
-      ),
-    ],
-  );
-
-  blocTest<PlacesBloc, PlacesState>(
-    'search matches names only, not addresses',
-    build: () => PlacesBloc(usecase),
-    seed: () {
-      final seeded = [
-        _place(
-          'node/1',
-          'Olivia Restaurant',
-          PlaceCategory.restaurant,
-          address: 'City Mall Street',
-        ),
-        _place('node/2', 'City Mall', PlaceCategory.shopping),
-      ];
-      return PlacesState(
-        status: PlacesStatus.success,
-        allPlaces: seeded,
-        visiblePlaces: seeded,
-      );
-    },
-    act: (bloc) => bloc.add(const PlaceSearchQueryChanged('mall')),
+    seed: () =>
+        const PlacesState(status: PlacesStatus.success, lastRequest: params),
+    act: (bloc) => bloc.add(const PlacesRefreshed()),
     expect: () => [
       isA<PlacesState>().having(
-        (s) => s.visiblePlaces.map((p) => p.id).toList(),
-        'visible ids',
-        ['node/2'],
+        (s) => s.status,
+        'status',
+        PlacesStatus.loading,
       ),
+      isA<PlacesState>()
+          .having((s) => s.status, 'status', PlacesStatus.success)
+          .having((s) => s.allPlaces, 'allPlaces', places),
     ],
+    verify: (_) => verify(
+      () => usecase(const NearbyPlacesParams(latitude: 10, longitude: 20)),
+    ).called(1),
   );
 
   blocTest<PlacesBloc, PlacesState>(
-    'clearing the category shows all places again',
+    'a refresh with nothing asked before reads nothing',
     build: () => PlacesBloc(usecase),
-    seed: () => PlacesState(
-      status: PlacesStatus.success,
-      allPlaces: places,
-      visiblePlaces: places
-          .where((p) => p.category == PlaceCategory.cafe)
-          .toList(),
-      category: PlaceCategory.cafe,
-    ),
-    act: (bloc) => bloc.add(const PlaceCategoryFiltered(null)),
-    expect: () => [
-      isA<PlacesState>()
-          .having((s) => s.category, 'category', isNull)
-          .having((s) => s.visiblePlaces, 'visiblePlaces', places),
-    ],
+    act: (bloc) => bloc.add(const PlacesRefreshed()),
+    expect: () => <PlacesState>[],
+    verify: (_) => verifyNever(() => usecase(any())),
   );
 }

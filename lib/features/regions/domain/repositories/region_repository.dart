@@ -11,8 +11,5 @@ abstract interface class RegionRepository {
   });
 
   /// One page of all regions.
-  Future<Result<RegionPage>> getRegions({
-    required String locale,
-    int page,
-  });
+  Future<Result<RegionPage>> getRegions({required String locale, int page});
 }

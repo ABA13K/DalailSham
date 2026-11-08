@@ -8,11 +8,13 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../banners/domain/entities/banner_ad.dart';
 import '../../../banners/presentation/cubit/banners_cubit.dart';
 
-/// Auto-scrolling carousel of the live promotional banners.
+/// Auto-scrolling carousel of the live promotional banners, drawn as the hero
+/// card at the top of the home feed.
 class AdvertiseBar extends StatelessWidget {
   const AdvertiseBar({super.key});
 
   static const autoAdvance = Duration(seconds: 4);
+  static const heroHeight = 168.0;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,7 @@ class _BannerBarShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
-      child: ShimmerBox(height: 104, borderRadius: 18),
+      child: ShimmerBox(height: AdvertiseBar.heroHeight, borderRadius: 20),
     );
   }
 }
@@ -102,19 +104,22 @@ class _BannerCarouselState extends State<_BannerCarousel> {
         textScaler.scale(fontSize ?? style?.fontSize ?? 14) *
         (height ?? style?.height ?? 1.2) *
         maxLines;
-    // Keep the strip as tall as its text needs when the system font grows.
+
+    // Keep the card as tall as its text needs when the system font grows.
     final contentHeight =
-        12 +
-        line(textTheme.labelSmall, fontSize: 10, height: 1.3) +
-        2 +
+        32 +
+        line(textTheme.bodySmall, fontSize: 12, height: 1.3) +
+        4 +
+        line(textTheme.headlineSmall, fontSize: 24, height: 1.25, maxLines: 2) +
         6 +
-        line(textTheme.titleSmall, height: 1.35, maxLines: 2) +
-        12;
-    final adHeight = contentHeight + 4 > 104 ? contentHeight + 4 : 104.0;
+        line(textTheme.labelMedium, fontSize: 12, height: 1.3);
+    final adHeight = contentHeight + 4 > AdvertiseBar.heroHeight
+        ? contentHeight + 4
+        : AdvertiseBar.heroHeight;
     final banners = widget.banners;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 4),
       child: Column(
         children: [
           SizedBox(
@@ -136,14 +141,14 @@ class _BannerCarouselState extends State<_BannerCarousel> {
                   padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: _BannerCard(
                     banner: banners[index],
-                    label: l10n.adLabel,
+                    subtitle: l10n.adLabel,
                   ),
                 ),
               ),
             ),
           ),
           if (banners.length > 1) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -151,14 +156,17 @@ class _BannerCarouselState extends State<_BannerCarousel> {
                   AnimatedContainer(
                     key: ValueKey('ad-dot-$index'),
                     duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    margin: const EdgeInsets.symmetric(horizontal: 2.5),
                     width: index == _page ? 18 : 6,
                     height: 6,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(3),
                       color: index == _page
                           ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.outlineVariant,
+                          : Theme.of(context)
+                                .colorScheme
+                                .outlineVariant
+                                .withValues(alpha: 0.6),
                     ),
                   ),
               ],
@@ -171,19 +179,34 @@ class _BannerCarouselState extends State<_BannerCarousel> {
 }
 
 class _BannerCard extends StatelessWidget {
-  const _BannerCard({required this.banner, required this.label});
+  const _BannerCard({
+    required this.banner,
+    required this.subtitle,
+  });
 
   final BannerAd banner;
-  final String label;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
 
+    // Optional: If banner.text contains multiple lines separated by '\n',
+    // split it into [subtitle, title, cta] or fall back to defaults.
+    final lines = banner.text
+        .split('\n')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    final topText = lines.length >= 2 ? lines[0] : subtitle;
+    final mainTitle = lines.length >= 2 ? lines[1] : banner.text;
+    final bottomCta = lines.length >= 3 ? lines[2] : null;
+
     return Container(
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(18)),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -198,7 +221,7 @@ class _BannerCard extends StatelessWidget {
             child: Center(
               child: Icon(
                 Icons.campaign_rounded,
-                size: 40,
+                size: 56,
                 color: Colors.white.withValues(alpha: 0.4),
               ),
             ),
@@ -211,54 +234,90 @@ class _BannerCard extends StatelessWidget {
               loadingBuilder: (context, child, progress) =>
                   progress == null ? child : const SizedBox.shrink(),
             ),
+          // Directional gradient: darkens the start side (Right in RTL) and bottom
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.center,
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+                stops: const [0.0, 0.55, 1.0],
+                colors: [
+                  Colors.black.withValues(alpha: 0.72),
+                  Colors.black.withValues(alpha: 0.35),
+                  Colors.black.withValues(alpha: 0.05),
+                ],
+              ),
+            ),
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: const [0.25, 1],
+                stops: const [0.4, 1.0],
                 colors: [
                   const Color(0x00000000),
-                  Colors.black.withValues(alpha: 0.78),
+                  Colors.black.withValues(alpha: 0.55),
                 ],
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 1,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.22),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    label,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: Colors.white,
-                      fontSize: 10,
-                      height: 1.3,
-                    ),
+                Text(
+                  topText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    height: 1.3,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
-                  banner.text,
+                  mainTitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: textTheme.titleSmall?.copyWith(
+                  style: textTheme.headlineSmall?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    height: 1.35,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    height: 1.25,
                   ),
                 ),
+                if (bottomCta != null) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          bottomCta,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.95),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.arrow_forward,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

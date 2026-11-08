@@ -41,7 +41,6 @@
   "locationPermissionMessage": "We use your location to find places around you. Please enable it in system settings.",
   "locationServiceDisabled": "Location services are turned off. Please enable them in system settings.",
   "openSettings": "Open settings",
-  "placesEmpty": "No places found nearby",
   "placesError": "Something went wrong while loading places",
   "retry": "Retry",
   "distanceMeters": "{value} m",
@@ -63,13 +62,8 @@
     }
   },
   "profileTitle": "Business profile",
-  "sectionAbout": "About",
   "sectionContact": "Contact & location",
-  "sectionAmenities": "Services & amenities",
-  "sectionReviews": "Ratings & reviews",
-  "labelPrice": "Price",
   "labelReviews": "Reviews",
-  "labelSince": "Since",
   "statusOpenNow": "Open now",
   "statusClosed": "Closed",
   "statusOpen24": "Open 24 hours",
@@ -77,17 +71,6 @@
   "viewStory": "Watch story",
   "viewPhoto": "Show photo",
   "profilePhoto": "Profile photo",
-  "profilePopularFor": "Locals come here for {first} and {second}.",
-  "@profilePopularFor": {
-    "placeholders": {
-      "first": {
-        "type": "String"
-      },
-      "second": {
-        "type": "String"
-      }
-    }
-  },
   "labelCategory": "Category",
   "labelDistance": "Distance",
   "labelAddress": "Address",
@@ -103,8 +86,6 @@
   "language": "Language",
   "darkMode": "Dark mode",
   "adLabel": "Ad",
-  "menuTitle": "Menu",
-  "menuSubtitle": "Sample menu · prices in Syrian pounds",
   "currencySyp": "SYP",
   "ratingSummary": "Rated {rating} out of 5 · {count} reviews",
   "@ratingSummary": {
@@ -123,7 +104,7 @@
   "tutorialAdsTitle": "Offers",
   "tutorialAdsBody": "Local offers scroll automatically — swipe to browse them yourself.",
   "tutorialSearchTitle": "Search & filters",
-  "tutorialSearchBody": "Search by name, then narrow the results with the category chips below.",
+  "tutorialSearchBody": "Type to narrow the services below by name, category or area, then press search to look through the whole directory.",
   "tutorialMenuTitle": "Menu & settings",
   "tutorialMenuBody": "Open the menu to switch language, enable dark mode, or replay this tour.",
   "tutorialDone": "Got it",
@@ -131,13 +112,332 @@
   "storiesNow": "Now",
   "storiesClose": "Close stories",
   "viewPlace": "View place",
-  "demoDataNotice": "Demo data — live places are unavailable.",
   "chat": "Chat",
   "chatRoomTitle": "Chat room",
   "chatHint": "Write a message…",
   "chatSend": "Send",
   "chatEmpty": "No messages yet — start the conversation.",
   "chatError": "Something went wrong while loading messages",
-  "chatDemoNotice": "Demo chat — messages stay on this device only.",
-  "servicesEmpty": "No services in this category yet"
+  "chatLocalNotice": "Messages stay on this device only — chat is not connected yet.",
+  "servicesEmpty": "No services here yet",
+  "servicesError": "Something went wrong while loading services",
+  "topRatedTitle": "Top rated services",
+  "nearbyTitle": "Nearest to you",
+  "nearbyRandomTitle": "Picked for you",
+  "favoritesTitle": "Favorites",
+  "favoritesEmpty": "No favorites yet — tap the heart on a service to keep it here.",
+  "favoritesNeedLogin": "Favorites need an account. Sign in and try again.",
+  "addToFavorites": "Add to favorites",
+  "removeFromFavorites": "Remove from favorites",
+  "addedToFavorites": "Added to favorites",
+  "removedFromFavorites": "Removed from favorites",
+  "favoritesError": "Couldn't update favorites",
+  "accountTitle": "Account",
+  "loginTitle": "Login",
+  "registerTitle": "Create account",
+  "loginFieldLabel": "Email or mobile",
+  "passwordLabel": "Password",
+  "confirmPasswordLabel": "Confirm password",
+  "fullNameLabel": "Full name",
+  "mobileLabel": "Mobile number",
+  "emailLabel": "Email (optional)",
+  "addressLabel": "Address (optional)",
+  "genderLabel": "Gender",
+  "genderMale": "Male",
+  "genderFemale": "Female",
+  "signIn": "Sign in",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "noAccount": "No account yet?",
+  "haveAccount": "Already have an account?",
+  "fieldRequired": "Required",
+  "passwordTooShort": "Use at least 6 characters",
+  "passwordMismatch": "The two passwords do not match",
+  "genderRequired": "Choose your gender",
+  "loggedIn": "Signed in successfully",
+  "accountCreated": "Account created successfully",
+  "signedOut": "Signed out",
+  "logout": "Logout",
+  "accountProfileTitle": "Profile",
+  "profileSaved": "Profile updated successfully",
+  "saveChanges": "Save changes",
+  "changePhoto": "Change photo",
+  "removePhoto": "Remove photo",
+  "photoPickFailed": "Couldn't get that photo",
+  "changePasswordTitle": "Change password",
+  "currentPasswordLabel": "Current password",
+  "newPasswordLabel": "New password",
+  "passwordChanged": "Password changed successfully",
+  "deleteAccountTitle": "Delete account",
+  "deleteAccountWarning": "This removes your account for good. Enter your password to confirm.",
+  "accountDeleted": "Account deleted",
+  "cancel": "Cancel",
+  "vendorServiceTitle": "My service",
+  "vendorServiceSaved": "Service updated successfully",
+  "removeMainImage": "Remove cover photo",
+  "nameArabicLabel": "Name (Arabic)",
+  "nameEnglishLabel": "Name (English)",
+  "addressArabicLabel": "Address (Arabic)",
+  "addressEnglishLabel": "Address (English)",
+  "descriptionArabicLabel": "Description (Arabic)",
+  "descriptionEnglishLabel": "Description (English)",
+  "mapsUrlLabel": "Google Maps link",
+  "latitudeLabel": "Latitude",
+  "longitudeLabel": "Longitude",
+  "invalidUrl": "Enter a link starting with http or https",
+  "invalidLatitude": "Latitude must be between -90 and 90",
+  "invalidLongitude": "Longitude must be between -180 and 180",
+  "tooLong": "This text is too long",
+  "labelRating": "Rating",
+  "labelVisits": "Visits",
+  "labelPlan": "Plan",
+  "labelFlag": "Service",
+  "mainServiceFlag": "Main",
+  "searchEmpty": "Nothing matched that search",
+  "vendorJoinTitle": "List your service",
+  "joinIntro": "Tell us about yourself and your service. The listing goes live after an admin reviews it.",
+  "joinAccountSection": "Account",
+  "joinServiceSection": "Service",
+  "labelRegion": "Region",
+  "chooseRegion": "Choose a region",
+  "chooseCategory": "Choose a category",
+  "regionRequired": "Choose the region your service is in",
+  "categoryRequired": "Choose the category that fits your service",
+  "companyEmailLabel": "Company email (optional)",
+  "addCoverPhoto": "Add cover photo",
+  "sendRequest": "Send request",
+  "joinRequestSubmitted": "Request sent — an admin will review it",
+  "vendorContactsTitle": "Contact lines",
+  "contactsIntro": "The numbers, emails and links customers reach your service through.",
+  "contactsEmpty": "No contacts yet",
+  "addContact": "Add a contact",
+  "editContact": "Edit contact",
+  "chooseContactType": "Choose a type",
+  "labelContactType": "Type",
+  "labelContactValue": "Value",
+  "contactTypeRequired": "Choose the kind of contact",
+  "contactValueRequired": "Enter the number, address or link",
+  "saveContact": "Save",
+  "contactSaved": "Contact saved",
+  "primaryContact": "Primary",
+  "setPrimaryContact": "Make primary",
+  "deleteContact": "Delete",
+  "deleteContactQuestion": "Delete this contact?",
+  "vendorImagesTitle": "Service photos",
+  "imagesIntro": "The pictures shown under your service, once an admin approves them.",
+  "imagesLimit": "{count} of {max}",
+  "@imagesLimit": {
+    "description": "Photos a vendor has published against the limit they may hold",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesEmpty": "No photos yet",
+  "addImage": "Add a photo",
+  "imagePendingApproval": "Waiting for approval",
+  "deleteImage": "Delete photo",
+  "deleteImageQuestion": "Delete this photo?",
+  "deleteAllImages": "Delete all photos",
+  "deleteAllImagesQuestion": "Delete every photo of this service?",
+  "imagesRemovedAll": "Removed {count} photos",
+  "@imagesRemovedAll": {
+    "description": "How many photos the delete-all endpoint answered it removed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesLimitReached": "No room for another photo",
+  "searchPrompt": "Type to search the listed services",
+  "filterCategory": "Category",
+  "filterRegion": "Region",
+  "filterSort": "Sort",
+  "filterRating": "Rating",
+  "sortLatest": "Latest",
+  "sortTopRated": "Top rated",
+  "sortNearest": "Nearest",
+  "ratingAny": "Any rating",
+  "clearFilters": "Clear filters",
+  "vendorProductsTitle": "Products",
+  "productsIntro": "Everything your service sells. A new or edited product waits for an admin before customers see it.",
+  "productsSearchHint": "Search products…",
+  "productsEmpty": "No products yet",
+  "addProduct": "Add product",
+  "editProduct": "Edit product",
+  "deleteProduct": "Delete product",
+  "deleteProductQuestion": "Delete this product?",
+  "productSaved": "Product saved",
+  "productDeleted": "Product deleted",
+  "productPendingApproval": "Waiting for approval",
+  "productHidden": "Hidden",
+  "productUnavailable": "Not available",
+  "priceLabel": "Price (SYP)",
+  "quantityLabel": "Quantity",
+  "activeLabel": "Shown to customers",
+  "availableLabel": "In stock",
+  "productCategoryRequired": "Choose the category this product belongs to",
+  "filterStatus": "Status",
+  "statusAny": "Any status",
+  "statusPending": "Pending",
+  "statusApproved": "Approved",
+  "statusRejected": "Rejected",
+  "invalidPrice": "Enter a price from 0 to 9999999.99",
+  "invalidQuantity": "Enter a whole number up to 999999",
+  "vendorAmenitiesTitle": "Service amenities",
+  "amenitiesIntro": "What your service offers besides what it sells. A new or edited amenity waits for an admin before customers see it.",
+  "amenitiesLimit": "{count} of {max}",
+  "@amenitiesLimit": {
+    "description": "Amenities a vendor has published against the limit they may hold",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "amenitiesEmpty": "No amenities yet",
+  "addAmenity": "Add amenity",
+  "editAmenity": "Edit amenity",
+  "deleteAmenity": "Delete amenity",
+  "deleteAmenityQuestion": "Delete this amenity?",
+  "deleteAllAmenities": "Delete all amenities",
+  "deleteAllAmenitiesQuestion": "Delete every amenity of this service?",
+  "amenitiesRemovedAll": "Removed {count} amenities",
+  "@amenitiesRemovedAll": {
+    "description": "How many amenities the delete-all endpoint answered it removed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "amenitiesLimitReached": "No room for another amenity",
+  "amenityPendingApproval": "Waiting for approval",
+  "amenityWaitsForApproval": "The amenity reaches customers once an admin approves it.",
+  "amenitySaved": "Amenity saved",
+  "amenityDeleted": "Amenity deleted",
+  "vendorStoriesTitle": "Add a story",
+  "storyTypeTitle": "Story type",
+  "storyTypeImage": "Photo",
+  "storyTypeVideo": "Video",
+  "storyTypePoll": "Poll",
+  "storyCaptionArabicLabel": "Caption (Arabic)",
+  "storyCaptionEnglishLabel": "Caption (English)",
+  "storyPickPhoto": "Choose a photo",
+  "storyPickVideo": "Choose a video",
+  "storyPhotoRequired": "Choose the photo this story shows",
+  "storyVideoRequired": "Choose the video this story shows",
+  "storyQuestionArabicLabel": "Question (Arabic)",
+  "storyQuestionEnglishLabel": "Question (English)",
+  "storyOptionsLabel": "Poll options",
+  "storyOptionLabel": "Option {number}",
+  "@storyOptionLabel": {
+    "description": "Label of one poll option field, counted from the first row",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "storyAddOption": "Add option",
+  "storyRemoveOption": "Remove this option",
+  "storyOptionsTooFew": "A poll needs at least two options",
+  "storyPublish": "Publish story",
+  "storySaved": "Story created, waiting for approval",
+  "storyWaitsForApproval": "The story reaches customers once an admin approves it.",
+  "storyExpiresIn": "Gone in {hours} h",
+  "@storyExpiresIn": {
+    "description": "Hours a published story has left before it drops off the feed",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "storyNoVotes": "No votes yet",
+  "storyVoteHint": "Tap an answer to vote",
+  "storyVoteFailed": "Your vote could not be recorded",
+  "serviceStoriesAll": "See all stories from this service",
+  "serviceStoriesEmpty": "This service has no stories right now",
+  "cityTitle": "Damascus",
+  "mainCategories": "Main categories",
+  "filtersTitle": "Filters",
+  "notificationsEmpty": "Nothing new right now",
+  "notificationsTitle": "Notifications",
+  "navHome": "Home",
+  "navCategories": "Categories",
+  "navMenu": "Menu",
+  "serviceProfileTitle": "Service profile",
+  "sectionAbout": "About",
+  "sectionPhotos": "Photos",
+  "photosCount": "{count, plural, =1{1 photo} other{{count} photos}}",
+  "@photosCount": {
+    "description": "How many pictures a service published",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "galleryPosition": "{current} of {total}",
+  "@galleryPosition": {
+    "description": "Which picture of the set the viewer is showing",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "galleryError": "Something went wrong while loading photos",
+  "sectionMenu": "Menu",
+  "menuError": "Something went wrong while loading products",
+  "productsCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@productsCount": {
+    "description": "How many products a menu or one of its categories holds",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "outOfStock": "Out of stock",
+  "sectionReviews": "Ratings & reviews",
+  "reviewsEmpty": "No reviews yet",
+  "reviewsError": "Something went wrong while loading reviews",
+  "reviewsCount": "{count, plural, =1{1 review} other{{count} reviews}}",
+  "@reviewsCount": {
+    "description": "How many opinions a service collected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortHighest": "Highest rated",
+  "sortLowest": "Lowest rated",
+  "reviewMine": "Your review",
+  "reviewAnonymous": "Guest",
+  "sectionHours": "Working hours",
+  "hoursToday": "Today",
+  "sectionAmenities": "Amenities",
+  "visitsCount": "{count, plural, =1{1 visit} other{{count} visits}}",
+  "@visitsCount": {
+    "description": "How many times readers opened this service",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

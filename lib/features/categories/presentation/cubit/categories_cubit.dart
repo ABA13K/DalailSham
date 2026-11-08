@@ -47,14 +47,21 @@ class CategoriesCubit extends Cubit<CategoriesState> {
 
   Future<void> load(String locale) async {
     _locale = locale;
-    emit(const CategoriesLoading());
+    // A refresh keeps the showcase that is already on screen; a placeholder is
+    // only worth showing while there is nothing to show yet.
+    final shown = state;
+    final hasShowcase = shown is CategoriesReady && shown.categories.isNotEmpty;
+    if (!hasShowcase) emit(const CategoriesLoading());
     final result = await _getRandomCategories(
       RandomCategoriesParams(locale: locale),
     );
     // Ignore a response that arrives after the locale changed.
     if (isClosed || _locale != locale) return;
     result.fold(
-      (failure) => emit(CategoriesError(failure)),
+      (failure) {
+        if (!hasShowcase) emit(CategoriesError(failure));
+      },
+      // An identical response leaves the state untouched.
       (categories) => emit(CategoriesReady(categories)),
     );
   }

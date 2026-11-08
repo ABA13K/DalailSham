@@ -5,28 +5,46 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/app_bottom_bar.dart';
 import '../../../../app/app_drawer.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/settings/presentation/token_cubit.dart';
 import '../../../../core/widgets/centered_content.dart';
+import '../../../../core/widgets/option_sheet.dart';
 import '../../../../core/widgets/shimmer.dart';
+import '../../../../di/injection.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../banners/presentation/cubit/banners_cubit.dart';
 import '../../../categories/presentation/cubit/categories_cubit.dart';
-import '../../../categories/presentation/widgets/category_rail.dart';
+import '../../../categories/presentation/widgets/category_pills.dart';
 import '../../../location/presentation/location_cubit.dart';
+import '../../../regions/domain/entities/region.dart';
 import '../../../regions/presentation/cubit/regions_cubit.dart';
 import '../../../regions/presentation/widgets/region_rail.dart';
+import '../../../services/domain/entities/service_scope.dart';
+import '../../../services/domain/entities/service_summary.dart';
+import '../../../services/presentation/cubit/nearby_cubit.dart';
+import '../../../services/presentation/cubit/services_cubit.dart';
+import '../../../services/presentation/cubit/top_rated_cubit.dart';
+import '../../../services/presentation/widgets/nearby_rail.dart';
+import '../../../services/presentation/widgets/service_card.dart';
+import '../../../services/presentation/widgets/top_rated_rail.dart';
+import '../../../stories/domain/entities/story.dart';
+import '../../../stories/domain/entities/story_feed.dart';
+import '../../../stories/domain/usecases/get_service_story_feed.dart';
+import '../../../stories/presentation/cubit/story_feed_cubit.dart';
+import '../../../stories/presentation/pages/service_stories_page.dart';
+import '../../../stories/presentation/widgets/story_strip.dart';
 import '../../../tutorial/presentation/feature_tour.dart';
 import '../../../tutorial/presentation/tutorial_cubit.dart';
+import '../../../vendor/domain/repositories/vendor_picker_repository.dart';
 import '../bloc/places_bloc.dart';
 import '../cubit/stories_seen_cubit.dart';
 import 'stories_page.dart';
 import '../widgets/advertise_bar.dart';
-import '../widgets/category_filter_bar.dart';
-import '../widgets/place_card.dart';
 import '../widgets/place_stories_bar.dart';
 
-/// Feed of nearby places: resolves location, then loads and filters places.
+/// Feed of nearby services: resolves location, then loads and filters them.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -37,6 +55,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const _searchDebounce = Duration(milliseconds: 300);
 
+  /// How far a tap on a story follows the service's archive for pages. Beyond
+  /// this the viewer runs on what was already gathered.
+  static const _archivePageCap = 3;
+
   final _searchController = TextEditingController();
   final _appBarKey = GlobalKey();
   final _storiesKey = GlobalKey();
@@ -44,6 +66,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _searchKey = GlobalKey();
   Timer? _searchTimer;
   String? _feedLocale;
+  String _query = '';
+
+  /// A tap that is still gathering the service's stories. A second one while it
+  /// waits would open two viewers over the same set.
+  bool _storyOpening = false;
+
+  /// The category whose pill is pressed, or null while the list holds every
+  /// place near the user.
+  int? _categoryId;
+
+  /// The region picked from the header, with the name it is shown under. Only
+  /// one of the two filters is ever active, so the list never hides behind two.
+  int? _regionId;
+  String? _regionName;
 
   @override
   void initState() {
@@ -85,6 +121,255 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     context.read<CategoriesCubit>().load(locale);
     context.read<RegionsCubit>().load(locale);
     context.read<BannersCubit>().load(locale);
+    // The stories listing needs no token and no location; only the language of
+    // its labels changes.
+    context.read<StoryFeedCubit>().load(locale);
+    _loadServices();
+  }
+
+  /// The three service sections depend on the stored token and on the location,
+  /// which the backend uses to sort and label distances. The list under the
+  /// search field is asked for on the same terms, read page by page.
+  void _loadServices() {
+    final location = context.read<LocationCubit>().state;
+    final locale = Localizations.localeOf(context).languageCode;
+    final authenticated = context.read<TokenCubit>().state != null;
+    final userLat = location is LocationReady ? location.latitude : null;
+    final userLng = location is LocationReady ? location.longitude : null;
+
+    context.read<TopRatedCubit>().load(
+      locale: locale,
+      authenticated: authenticated,
+      userLat: userLat,
+      userLng: userLng,
+    );
+    context.read<NearbyCubit>().load(
+      locale: locale,
+      authenticated: authenticated,
+      userLat: userLat,
+      userLng: userLng,
+    );
+    _loadFeed();
+  }
+
+  /// The list under the search field: every place near the user, or the ones
+  /// inside the pressed category pill or the region picked from the header.
+  void _loadFeed() {
+    final location = context.read<LocationCubit>().state;
+    final region = _regionId;
+    final category = _categoryId;
+    final scope = region != null
+        ? ServiceScope.region
+        : category != null
+        ? ServiceScope.category
+        : ServiceScope.nearby;
+    context.read<ServicesCubit>().load(
+      scope: scope,
+      scopeId: region ?? category,
+      locale: Localizations.localeOf(context).languageCode,
+      authenticated: context.read<TokenCubit>().state != null,
+      userLat: location is LocationReady ? location.latitude : null,
+      userLng: location is LocationReady ? location.longitude : null,
+    );
+  }
+
+  /// The stories row. The services' own stories take it as soon as the public
+  /// listing has any; while it has none the nearby places stand in, so the
+  /// section is never an empty row and a place profile stays reachable.
+  Widget _storiesStrip() {
+    return BlocBuilder<StoryFeedCubit, StoryFeedState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.stories != current.stories,
+      builder: (context, feed) {
+        final waiting =
+            feed.status == StoryFeedStatus.initial ||
+            feed.status == StoryFeedStatus.loading;
+        if (!waiting && feed.stories.isEmpty) {
+          return BlocBuilder<PlacesBloc, PlacesState>(
+            buildWhen: (previous, current) =>
+                previous.allPlaces != current.allPlaces,
+            builder: (context, state) =>
+                BlocBuilder<StoriesSeenCubit, Set<String>>(
+                  buildWhen: (previous, current) => previous != current,
+                  builder: (context, viewedIds) => PlaceStoriesBar(
+                    places: state.allPlaces,
+                    viewedIds: viewedIds,
+                    onStoryTap: (place, index) => context.push(
+                      '/stories',
+                      extra: StoriesArgs(
+                        places: state.allPlaces
+                            .take(PlaceStoriesBar.maxStories)
+                            .toList(),
+                        initialIndex: index,
+                      ),
+                    ),
+                  ),
+                ),
+          );
+        }
+
+        return BlocBuilder<StoriesSeenCubit, Set<String>>(
+          buildWhen: (previous, current) => previous != current,
+          builder: (context, viewedIds) => StoryStrip(
+            status: feed.status,
+            stories: feed.stories,
+            viewedIds: viewedIds,
+            onStoryTap: (index) =>
+                _openStory(feed.stories[index], feed.stories),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Tapping a story runs everything its service posted, not only the page the
+  /// strip happens to show: the archive behind it is gathered first and the
+  /// viewer opens on the story that was tapped. A story that names no service,
+  /// or an archive that will not answer, plays the strip's own set instead, so
+  /// a tap is never a dead one.
+  Future<void> _openStory(Story tapped, List<Story> fromFeed) async {
+    if (_storyOpening) return;
+
+    final service = tapped.service;
+    if (service == null) {
+      _showStories(fromFeed, tapped);
+      return;
+    }
+
+    _storyOpening = true;
+    try {
+      final archive = await _wholeArchive(service.id);
+      if (!mounted) return;
+      if (archive.isEmpty) {
+        _showStories(fromFeed, tapped);
+        return;
+      }
+      // The strip held this story a moment ago; an archive that no longer does
+      // still opens where the reader pointed.
+      _showStories(
+        archive.any((story) => story.id == tapped.id) ? archive : [
+          tapped,
+          ...archive,
+        ],
+        tapped,
+      );
+    } finally {
+      _storyOpening = false;
+    }
+  }
+
+  /// One service's stories, page by page, as long as it keeps offering another
+  /// page and none of them repeats. A page that will not answer ends the walk
+  /// with what came before it.
+  Future<List<Story>> _wholeArchive(int serviceId) async {
+    final locale = Localizations.localeOf(context).languageCode;
+    final getServiceStories = getIt<GetServiceStoryFeed>();
+    final gathered = <Story>[];
+    final seenIds = <int>{};
+    int? page = 1;
+
+    for (var taken = 0; page != null && taken < _archivePageCap; taken++) {
+      final result = await getServiceStories(
+        ServiceStoryFeedParams(serviceId: serviceId, locale: locale, page: page),
+      );
+      final feed = result.fold<StoryFeed?>(
+        (_) => null,
+        (feed) => feed,
+      );
+      if (feed == null) break;
+
+      for (final story in feed.stories) {
+        if (seenIds.add(story.id)) gathered.add(story);
+      }
+      page = feed.hasMore ? (feed.nextPage ?? page + 1) : null;
+    }
+    return gathered;
+  }
+
+  /// The viewer over [stories], opening on [tapped] wherever it landed.
+  void _showStories(List<Story> stories, Story tapped) {
+    final index = stories.indexWhere((story) => story.id == tapped.id);
+    context.push(
+      '/service-stories',
+      extra: ServiceStoriesArgs(
+        stories: stories,
+        initialIndex: index < 0 ? 0 : index,
+      ),
+    );
+  }
+
+  /// A pill carries its category with it, so choosing one reloads only the list
+  /// under the search field and leaves the rails above untouched. It also hands
+  /// the header back to the whole city, since one list cannot hold two filters.
+  void _selectCategory(int? categoryId) {
+    if (categoryId == _categoryId) return;
+    setState(() {
+      _categoryId = categoryId;
+      if (categoryId != null) {
+        _regionId = null;
+        _regionName = null;
+      }
+    });
+    _loadFeed();
+  }
+
+  /// The header is the city, or the region the list is currently narrowed to.
+  /// Pressing it again and choosing the same region lifts the filter.
+  Future<void> _pickRegion() async {
+    final l10n = AppLocalizations.of(context);
+    final region = await showOptionSheet<Region>(
+      context,
+      title: l10n.chooseRegion,
+      label: (region) => region.name,
+      load: _loadRegions,
+    );
+    if (!mounted || region == null) return;
+
+    final lifted = region.id == _regionId;
+    setState(() {
+      _regionId = lifted ? null : region.id;
+      _regionName = lifted ? null : region.name;
+      if (!lifted) _categoryId = null;
+    });
+    _loadFeed();
+  }
+
+  Future<List<Region>> _loadRegions(String locale, String? query) async {
+    final result = await getIt<VendorPickerRepository>().regions(
+      locale: locale,
+      query: query,
+    );
+    return result.fold((failure) => throw failure, (regions) => regions);
+  }
+
+  /// The backend has no notifications endpoint yet, so the bell only reports
+  /// that there is nothing to read.
+  void _showNotifications() {
+    final l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          key: const ValueKey('notifications-empty'),
+          content: Text(l10n.notificationsEmpty),
+        ),
+      );
+  }
+
+  /// What the list under the search field currently holds.
+  String _feedTitle(AppLocalizations l10n) {
+    final region = _regionId;
+    if (region != null) return _regionName ?? l10n.homeTitle;
+    final categoryId = _categoryId;
+    if (categoryId == null) return l10n.homeTitle;
+    final shown = context.read<CategoriesCubit>().state;
+    if (shown is CategoriesReady) {
+      for (final category in shown.categories) {
+        if (category.id == categoryId) return category.name;
+      }
+    }
+    return l10n.homeTitle;
   }
 
   @override
@@ -102,26 +387,36 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _searchTimer?.cancel();
     _searchTimer = Timer(_searchDebounce, () {
       if (!mounted) return;
-      context.read<PlacesBloc>().add(PlaceSearchQueryChanged(value));
+      setState(() => _query = value.trim());
     });
   }
 
   void _submitSearch(String value) {
     _searchTimer?.cancel();
-    context.read<PlacesBloc>().add(PlaceSearchQueryChanged(value));
+    final query = value.trim();
+    if (query.isEmpty) return;
+    // Typing narrows what the feed already holds; the keyboard action asks the
+    // backend, which also searches services the feed never loaded.
+    context.push('/search', extra: query);
   }
 
   void _clearSearch() {
     _searchTimer?.cancel();
     _searchController.clear();
-    context.read<PlacesBloc>().add(const PlaceSearchQueryChanged(''));
-    setState(() {});
+    setState(() => _query = '');
   }
 
-  void _refresh() {
-    context.read<CategoriesCubit>().reload();
+  Future<void> _refresh() async {
+    final showcase = context.read<CategoriesCubit>();
+    final categoriesRefresh = showcase.reload();
     context.read<RegionsCubit>().reload();
     context.read<BannersCubit>().reload();
+    // The strip is part of what the reader pulls for. Asked in the same
+    // language it keeps the stories on screen until the new page lands.
+    final storiesRefresh = context
+        .read<StoryFeedCubit>()
+        .load(Localizations.localeOf(context).languageCode);
+    _loadServices();
     final location = context.read<LocationCubit>().state;
     switch (location) {
       case LocationReady():
@@ -132,6 +427,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case LocationLoading():
         break;
     }
+    await Future.wait([categoriesRefresh, storiesRefresh]);
+    if (!mounted) return;
+    // A refresh can hand back a different showcase, and a category whose pill is
+    // gone has nothing left to press, so the list falls back to the nearby one.
+    final shown = showcase.state;
+    final kept =
+        shown is CategoriesReady &&
+        shown.categories.any((category) => category.id == _categoryId);
+    if (_categoryId != null && !kept) _selectCategory(null);
   }
 
   @override
@@ -149,8 +453,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   longitude: state.longitude,
                 ),
               );
+              _loadServices();
             }
           },
+        ),
+        BlocListener<TokenCubit, String?>(
+          listener: (context, token) => _loadServices(),
         ),
         BlocListener<PlacesBloc, PlacesState>(
           listenWhen: (previous, current) =>
@@ -180,22 +488,51 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               drawer: const AppDrawer(),
               appBar: AppBar(
                 key: _appBarKey,
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.homeTitle,
-                      style: Theme.of(context).textTheme.titleLarge,
+                title: InkWell(
+                  key: const ValueKey('header-city'),
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _pickRegion,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 6,
                     ),
-                    Text(
-                      l10n.appTagline,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                _regionName ?? l10n.cityTitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleLarge,
+                              ),
+                            ),
+                            const Icon(Icons.expand_more_rounded, size: 22),
+                          ],
+                        ),
+                        Text(
+                          l10n.appTagline,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 actions: [
+                  IconButton(
+                    key: const ValueKey('header-notifications'),
+                    tooltip: l10n.notificationsTitle,
+                    icon: const Icon(Icons.notifications_none_rounded),
+                    onPressed: _showNotifications,
+                  ),
                   IconButton(
                     tooltip: l10n.retry,
                     icon: const Icon(Icons.refresh_rounded),
@@ -203,91 +540,96 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 ],
               ),
+              bottomNavigationBar: const AppBottomBar(),
               body: CenteredContent(
                 child: RefreshIndicator(
                   onRefresh: () async => _refresh(),
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
+                      const SliverToBoxAdapter(child: _LocationNotice()),
                       SliverToBoxAdapter(
-                        child: BlocBuilder<PlacesBloc, PlacesState>(
-                          buildWhen: (previous, current) =>
-                              previous.isDemoData != current.isDemoData,
-                          builder: (context, state) => state.isDemoData
-                              ? const _DemoDataBanner()
-                              : const SizedBox.shrink(),
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: KeyedSubtree(
-                          key: _storiesKey,
-                          child: BlocBuilder<PlacesBloc, PlacesState>(
-                            buildWhen: (previous, current) =>
-                                previous.allPlaces != current.allPlaces,
-                            builder: (context, state) =>
-                                BlocBuilder<StoriesSeenCubit, Set<String>>(
-                                  buildWhen: (previous, current) =>
-                                      previous != current,
-                                  builder: (context, viewedIds) =>
-                                      PlaceStoriesBar(
-                                        places: state.allPlaces,
-                                        viewedIds: viewedIds,
-                                        onStoryTap: (place, index) =>
-                                            context.push(
-                                              '/stories',
-                                              extra: StoriesArgs(
-                                                places: state.allPlaces
-                                                    .take(
-                                                      PlaceStoriesBar
-                                                          .maxStories,
-                                                    )
-                                                    .toList(),
-                                                initialIndex: index,
-                                              ),
-                                            ),
-                                      ),
+                        child: Padding(
+                          key: _searchKey,
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primaryContainer,
+                                  shape: BoxShape.circle,
                                 ),
+                                child: IconButton(
+                                  key: const ValueKey('feed-filters'),
+                                  tooltip: l10n.filtersTitle,
+                                  icon: const Icon(Icons.filter_alt_rounded),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer,
+                                  onPressed: () => context.push('/search'),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    hintText: l10n.searchHint,
+                                    prefixIcon: const Icon(
+                                      Icons.search_rounded,
+                                    ),
+                                    suffixIcon: _searchController.text.isEmpty
+                                        ? null
+                                        : IconButton(
+                                            key: const ValueKey(
+                                              'search-clear-feed',
+                                            ),
+                                            icon: const Icon(
+                                              Icons.clear_rounded,
+                                            ),
+                                            onPressed: _clearSearch,
+                                          ),
+                                  ),
+                                  onChanged: _onSearchChanged,
+                                  onSubmitted: _submitSearch,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                       SliverToBoxAdapter(child: AdvertiseBar(key: _adsKey)),
-                      const SliverToBoxAdapter(child: CategoryRail()),
+                      SliverToBoxAdapter(
+                        child: KeyedSubtree(
+                          key: _storiesKey,
+                          child: _storiesStrip(),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: CategoryPills(
+                          selectedId: _categoryId,
+                          onSelect: _selectCategory,
+                        ),
+                      ),
                       const SliverToBoxAdapter(child: RegionRail()),
+                      const SliverToBoxAdapter(child: TopRatedRail()),
+                      const SliverToBoxAdapter(child: NearbyRail()),
                       SliverToBoxAdapter(
                         child: Padding(
-                          key: _searchKey,
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                          child: TextField(
-                            controller: _searchController,
-                            decoration: InputDecoration(
-                              hintText: l10n.searchHint,
-                              prefixIcon: const Icon(Icons.search_rounded),
-                              suffixIcon: _searchController.text.isEmpty
-                                  ? null
-                                  : IconButton(
-                                      icon: const Icon(Icons.clear_rounded),
-                                      onPressed: _clearSearch,
-                                    ),
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                          child: Text(
+                            _feedTitle(l10n),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
                             ),
-                            onChanged: _onSearchChanged,
-                            onSubmitted: _submitSearch,
                           ),
                         ),
                       ),
-                      SliverToBoxAdapter(
-                        child: BlocBuilder<PlacesBloc, PlacesState>(
-                          buildWhen: (previous, current) =>
-                              previous.category != current.category,
-                          builder: (context, state) => CategoryFilterBar(
-                            selected: state.category,
-                            onSelected: (category) => context
-                                .read<PlacesBloc>()
-                                .add(PlaceCategoryFiltered(category)),
-                          ),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 8)),
-                      const _PlacesSliver(),
+                      _ServicesSliver(query: _query, onRetry: _loadServices),
                     ],
                   ),
                 ),
@@ -328,113 +670,207 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ];
 }
 
-class _PlacesSliver extends StatelessWidget {
-  const _PlacesSliver();
+/// Why the stories strip stayed empty when the app could not read the position.
+/// The service listing works without it, so this only explains the missing half.
+class _LocationNotice extends StatelessWidget {
+  const _LocationNotice();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
     return BlocBuilder<LocationCubit, LocationState>(
-      builder: (context, locationState) {
-        if (locationState is LocationFailureState &&
-            context.read<PlacesBloc>().state.allPlaces.isEmpty) {
-          return SliverFillRemaining(
-            hasScrollBody: false,
-            child: switch (locationState.failure) {
-              LocationPermissionFailure() => _EmptyState(
-                icon: Icons.location_off_rounded,
-                message: l10n.locationPermissionMessage,
-                action: FilledButton.icon(
-                  onPressed: () => Geolocator.openAppSettings(),
-                  icon: const Icon(Icons.settings_rounded),
-                  label: Text(l10n.openSettings),
-                ),
-              ),
-              LocationServiceDisabledFailure() => _EmptyState(
-                icon: Icons.location_off_rounded,
-                message: l10n.locationServiceDisabled,
-                action: FilledButton.icon(
-                  onPressed: () => Geolocator.openAppSettings(),
-                  icon: const Icon(Icons.settings_rounded),
-                  label: Text(l10n.openSettings),
-                ),
-              ),
-              _ => _EmptyState(
-                icon: Icons.error_outline_rounded,
-                message: l10n.placesError,
-                action: FilledButton.icon(
-                  onPressed: () => context.read<LocationCubit>().locate(),
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: Text(l10n.retry),
-                ),
-              ),
-            },
-          );
-        }
+      builder: (context, state) {
+        if (state is! LocationFailureState) return const SizedBox.shrink();
+        final message = switch (state.failure) {
+          LocationPermissionFailure() => l10n.locationPermissionMessage,
+          LocationServiceDisabledFailure() => l10n.locationServiceDisabled,
+          _ => null,
+        };
+        if (message == null) return const SizedBox.shrink();
 
-        return BlocBuilder<PlacesBloc, PlacesState>(
-          builder: (context, state) {
-            switch (state.status) {
-              case PlacesStatus.initial:
-              case PlacesStatus.loading:
-                if (state.allPlaces.isEmpty) {
-                  return const _PlacesShimmer();
-                }
-                return const _PlacesList();
-
-              case PlacesStatus.success:
-                if (state.visiblePlaces.isEmpty) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _EmptyState(
-                      icon: state.hasFilters
-                          ? Icons.search_off_rounded
-                          : Icons.location_off_rounded,
-                      message: l10n.placesEmpty,
-                    ),
-                  );
-                }
-                return const _PlacesList();
-
-              case PlacesStatus.failure:
-                if (state.allPlaces.isNotEmpty) {
-                  return const _PlacesList();
-                }
-                return SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: _EmptyState(
-                    icon: Icons.error_outline_rounded,
-                    message: l10n.placesError,
-                    action: FilledButton.icon(
-                      onPressed: () {
-                        final location = context.read<LocationCubit>().state;
-                        if (location is LocationReady) {
-                          context.read<PlacesBloc>().add(
-                            PlacesRequested(
-                              latitude: location.latitude,
-                              longitude: location.longitude,
-                            ),
-                          );
-                        } else {
-                          context.read<LocationCubit>().locate();
-                        }
-                      },
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: Text(l10n.retry),
-                    ),
+        final colors = Theme.of(context).colorScheme;
+        return Container(
+          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          padding: const EdgeInsetsDirectional.only(start: 12, end: 4),
+          decoration: BoxDecoration(
+            color: colors.errorContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.location_off_rounded,
+                size: 18,
+                color: colors.onErrorContainer,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  message,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: colors.onErrorContainer,
                   ),
-                );
-            }
-          },
+                ),
+              ),
+              TextButton(
+                key: const ValueKey('location-settings'),
+                onPressed: Geolocator.openAppSettings,
+                child: Text(l10n.openSettings),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 }
 
-class _PlacesShimmer extends StatelessWidget {
-  const _PlacesShimmer();
+/// The list under the search field: the services closest to the user, or the
+/// ones inside the category pill or the header region picked above it.
+class _ServicesSliver extends StatelessWidget {
+  const _ServicesSliver({required this.query, required this.onRetry});
+
+  final String query;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return BlocBuilder<ServicesCubit, ServicesState>(
+      builder: (context, state) {
+        final visible = _matching(state.services, query);
+        final cubit = context.read<ServicesCubit>();
+
+        switch (state.status) {
+          case ServicesStatus.initial:
+          case ServicesStatus.loading:
+            if (state.services.isEmpty) return const _FeedShimmer();
+            return _FeedList(
+              services: visible,
+              state: state,
+              cubit: cubit,
+              asksForMore: state.hasMore && query.isEmpty,
+            );
+
+          case ServicesStatus.failure:
+            if (state.services.isNotEmpty) {
+              return _FeedList(
+                services: visible,
+                state: state,
+                cubit: cubit,
+                asksForMore: state.hasMore && query.isEmpty,
+              );
+            }
+            return SliverFillRemaining(
+              hasScrollBody: false,
+              child: _EmptyState(
+                icon: Icons.error_outline_rounded,
+                message: l10n.servicesError,
+                action: FilledButton.icon(
+                  key: const ValueKey('feed-retry'),
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: Text(l10n.retry),
+                ),
+              ),
+            );
+
+          case ServicesStatus.ready:
+            if (visible.isEmpty) {
+              return SliverFillRemaining(
+                hasScrollBody: false,
+                child: _EmptyState(
+                  icon: query.isEmpty
+                      ? Icons.storefront_outlined
+                      : Icons.search_off_rounded,
+                  message: query.isEmpty
+                      ? l10n.servicesEmpty
+                      : l10n.searchEmpty,
+                ),
+              );
+            }
+            return _FeedList(
+              services: visible,
+              state: state,
+              cubit: cubit,
+              asksForMore: state.hasMore && query.isEmpty,
+            );
+        }
+      },
+    );
+  }
+}
+
+/// Services whose name, category or region carries the typed text.
+List<ServiceSummary> _matching(List<ServiceSummary> services, String query) {
+  if (query.isEmpty) return services;
+  final needle = query.toLowerCase();
+  return services
+      .where(
+        (service) =>
+            service.name.toLowerCase().contains(needle) ||
+            (service.categoryName?.toLowerCase().contains(needle) ?? false) ||
+            (service.regionName?.toLowerCase().contains(needle) ?? false),
+      )
+      .toList();
+}
+
+/// The cards, with the page after them asked for by the last row.
+class _FeedList extends StatelessWidget {
+  const _FeedList({
+    required this.services,
+    required this.state,
+    required this.cubit,
+    required this.asksForMore,
+  });
+
+  final List<ServiceSummary> services;
+  final ServicesState state;
+  final ServicesCubit cubit;
+
+  /// A narrowed list is not a page the feed can ask more of, so the button only
+  /// follows the whole list.
+  final bool asksForMore;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      sliver: SliverList.builder(
+        itemCount: services.length + (asksForMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index >= services.length) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: FilledButton.tonal(
+                key: const ValueKey('feed-load-more'),
+                onPressed: state.isLoadingMore ? null : () => cubit.loadMore(),
+                child: state.isLoadingMore
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(l10n.loadMore),
+              ),
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: ServiceCard(service: services[index]),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _FeedShimmer extends StatelessWidget {
+  const _FeedShimmer();
 
   @override
   Widget build(BuildContext context) {
@@ -443,14 +879,14 @@ class _PlacesShimmer extends StatelessWidget {
       sliver: SliverList.separated(
         itemCount: 4,
         separatorBuilder: (_, _) => const SizedBox(height: 10),
-        itemBuilder: (_, _) => const _PlaceCardShimmer(),
+        itemBuilder: (_, _) => const _ServiceCardShimmer(),
       ),
     );
   }
 }
 
-class _PlaceCardShimmer extends StatelessWidget {
-  const _PlaceCardShimmer();
+class _ServiceCardShimmer extends StatelessWidget {
+  const _ServiceCardShimmer();
 
   @override
   Widget build(BuildContext context) {
@@ -458,7 +894,7 @@ class _PlaceCardShimmer extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       child: Row(
         children: [
-          const ShimmerBox(width: 52, height: 52, borderRadius: 26),
+          const ShimmerBox(width: 60, height: 60, borderRadius: 12),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -472,69 +908,6 @@ class _PlaceCardShimmer extends StatelessWidget {
                   child: ShimmerBox(height: 13, borderRadius: 6),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PlacesList extends StatelessWidget {
-  const _PlacesList();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<PlacesBloc, PlacesState>(
-      buildWhen: (previous, current) =>
-          previous.visiblePlaces != current.visiblePlaces,
-      builder: (context, state) => SliverPadding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-        sliver: SliverList.separated(
-          itemCount: state.visiblePlaces.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final place = state.visiblePlaces[index];
-            return PlaceCard(
-              place: place,
-              onTap: () => context.push('/place', extra: place),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _DemoDataBanner extends StatelessWidget {
-  const _DemoDataBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.cloud_off_rounded,
-            size: 18,
-            color: theme.colorScheme.onSecondaryContainer,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              l10n.demoDataNotice,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onSecondaryContainer,
-              ),
             ),
           ),
         ],

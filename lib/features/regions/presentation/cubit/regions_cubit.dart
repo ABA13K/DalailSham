@@ -47,14 +47,19 @@ class RegionsCubit extends Cubit<RegionsState> {
 
   Future<void> load(String locale) async {
     _locale = locale;
-    emit(const RegionsLoading());
-    final result = await _getRandomRegions(
-      RandomRegionsParams(locale: locale),
-    );
+    // A refresh keeps the showcase that is already on screen; a placeholder is
+    // only worth showing while there is nothing to show yet.
+    final shown = state;
+    final hasShowcase = shown is RegionsReady && shown.regions.isNotEmpty;
+    if (!hasShowcase) emit(const RegionsLoading());
+    final result = await _getRandomRegions(RandomRegionsParams(locale: locale));
     // Ignore a response that arrives after the locale changed.
     if (isClosed || _locale != locale) return;
     result.fold(
-      (failure) => emit(RegionsError(failure)),
+      (failure) {
+        if (!hasShowcase) emit(RegionsError(failure));
+      },
+      // An identical response leaves the state untouched.
       (regions) => emit(RegionsReady(regions)),
     );
   }

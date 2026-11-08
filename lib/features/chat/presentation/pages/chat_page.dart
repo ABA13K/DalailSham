@@ -23,8 +23,9 @@ class ChatPage extends StatelessWidget {
     final name = place.displayNameFor(locale);
 
     return BlocProvider(
-      create: (_) => ChatCubit(getIt<ChatRepository>())
-        ..load(placeId: place.id, placeName: name, locale: locale),
+      create: (_) =>
+          ChatCubit(getIt<ChatRepository>())
+            ..load(placeId: place.id, placeName: name, locale: locale),
       child: Scaffold(
         appBar: AppBar(
           title: Column(
@@ -34,9 +35,9 @@ class ChatPage extends StatelessWidget {
                 name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               Text(
                 l10n.chatRoomTitle,
@@ -50,36 +51,36 @@ class ChatPage extends StatelessWidget {
         body: CenteredContent(
           child: Column(
             children: [
-              const _ChatDemoNotice(),
+              const _ChatLocalNotice(),
               Expanded(
                 child: BlocBuilder<ChatCubit, ChatState>(
                   builder: (context, state) => switch (state.status) {
                     ChatStatus.initial ||
                     ChatStatus.loading => const _ChatShimmer(),
                     ChatStatus.failure => Center(
-                      child: Text(
-                        l10n.chatError,
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Text(l10n.chatError, textAlign: TextAlign.center),
                     ),
-                    ChatStatus.ready => state.messages.isEmpty
-                        ? Center(
-                            child: Text(
-                              l10n.chatEmpty,
-                              textAlign: TextAlign.center,
+                    ChatStatus.ready =>
+                      state.messages.isEmpty
+                          ? Center(
+                              child: Text(
+                                l10n.chatEmpty,
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                          : ListView.separated(
+                              reverse: true,
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                              itemCount: state.messages.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 8),
+                              itemBuilder: (context, index) => _MessageBubble(
+                                message:
+                                    state.messages[state.messages.length -
+                                        1 -
+                                        index],
+                              ),
                             ),
-                          )
-                        : ListView.separated(
-                            reverse: true,
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                            itemCount: state.messages.length,
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(height: 8),
-                            itemBuilder: (context, index) => _MessageBubble(
-                              message:
-                                  state.messages[state.messages.length - 1 - index],
-                            ),
-                          ),
                   },
                 ),
               ),
@@ -92,8 +93,8 @@ class ChatPage extends StatelessWidget {
   }
 }
 
-class _ChatDemoNotice extends StatelessWidget {
-  const _ChatDemoNotice();
+class _ChatLocalNotice extends StatelessWidget {
+  const _ChatLocalNotice();
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +113,7 @@ class _ChatDemoNotice extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              l10n.chatDemoNotice,
+              l10n.chatLocalNotice,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -134,9 +135,9 @@ class _MessageBubble extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final mine = message.isMine;
-    final time = MaterialLocalizations.of(context).formatTimeOfDay(
-      TimeOfDay.fromDateTime(message.createdAt),
-    );
+    final time = MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(TimeOfDay.fromDateTime(message.createdAt));
 
     final foreground = mine ? scheme.onPrimary : scheme.onSurface;
     final muted = mine
@@ -183,7 +184,10 @@ class _MessageBubble extends StatelessWidget {
                     ),
                   ),
                 ),
-              Text(message.text, style: theme.textTheme.bodyMedium?.copyWith(color: foreground)),
+              Text(
+                message.text,
+                style: theme.textTheme.bodyMedium?.copyWith(color: foreground),
+              ),
               Align(
                 alignment: AlignmentDirectional.centerEnd,
                 child: Text(

@@ -37,8 +37,7 @@ class RegionsPage extends StatelessWidget {
                 icon: Icons.cloud_off_rounded,
                 message: l10n.placesError,
                 action: FilledButton.icon(
-                  onPressed: () =>
-                      context.read<AllRegionsCubit>().load(locale),
+                  onPressed: () => context.read<AllRegionsCubit>().load(locale),
                   icon: const Icon(Icons.refresh_rounded),
                   label: Text(l10n.retry),
                 ),

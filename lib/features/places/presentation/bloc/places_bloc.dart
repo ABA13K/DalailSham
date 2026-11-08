@@ -3,19 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/place.dart';
-import '../../domain/entities/place_category.dart';
 import '../../domain/usecases/get_nearby_places.dart';
 
 part 'places_event.dart';
 part 'places_state.dart';
 
-/// Loads nearby places and applies client-side filters.
+/// Loads the places around the user, which the stories strip reads.
 class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
   PlacesBloc(this._getNearbyPlaces) : super(const PlacesState()) {
     on<PlacesRequested>(_onRequested);
     on<PlacesRefreshed>(_onRefreshed);
-    on<PlaceCategoryFiltered>(_onCategoryFiltered);
-    on<PlaceSearchQueryChanged>(_onQueryChanged);
   }
 
   final GetNearbyPlaces _getNearbyPlaces;
@@ -61,59 +58,9 @@ class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
         state.copyWith(
           status: PlacesStatus.success,
           allPlaces: nearby.places,
-          visiblePlaces: _applyFilters(
-            nearby.places,
-            state.category,
-            state.query,
-          ),
-          isDemoData: nearby.isDemo,
           clearFailure: true,
         ),
       ),
     );
-  }
-
-  void _onCategoryFiltered(
-    PlaceCategoryFiltered event,
-    Emitter<PlacesState> emit,
-  ) {
-    emit(
-      state.copyWith(
-        category: event.category,
-        clearCategory: event.category == null,
-        visiblePlaces: _applyFilters(
-          state.allPlaces,
-          event.category,
-          state.query,
-        ),
-      ),
-    );
-  }
-
-  void _onQueryChanged(
-    PlaceSearchQueryChanged event,
-    Emitter<PlacesState> emit,
-  ) {
-    final query = event.query.trim();
-    emit(
-      state.copyWith(
-        query: query,
-        visiblePlaces: _applyFilters(state.allPlaces, state.category, query),
-      ),
-    );
-  }
-
-  List<Place> _applyFilters(
-    List<Place> places,
-    PlaceCategory? category,
-    String query,
-  ) {
-    final normalizedQuery = query.toLowerCase();
-    return places.where((place) {
-      if (category != null && place.category != category) return false;
-      if (normalizedQuery.isEmpty) return true;
-      return place.name.toLowerCase().contains(normalizedQuery) ||
-          (place.nameAr?.contains(query) ?? false);
-    }).toList();
   }
 }

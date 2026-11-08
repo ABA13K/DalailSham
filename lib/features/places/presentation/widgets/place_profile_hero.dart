@@ -6,21 +6,18 @@ import '../../domain/entities/place.dart';
 import 'category_info.dart';
 import 'company_profile.dart';
 import 'place_logo_mark.dart';
-import 'rating_badge.dart';
 
-/// Cover banner of a business profile: logo, name, key facts and rating.
+/// Cover banner of a business profile: logo, name and the listing's own facts.
 class PlaceProfileHero extends StatelessWidget {
   const PlaceProfileHero({
     super.key,
     required this.place,
-    required this.profile,
     required this.status,
     required this.hasStory,
     required this.onAvatarTap,
   });
 
   final Place place;
-  final CompanyProfile profile;
   final OpeningStatus? status;
   final bool hasStory;
   final VoidCallback onAvatarTap;
@@ -36,7 +33,6 @@ class PlaceProfileHero extends StatelessWidget {
         ? '?'
         : name.trim().substring(0, 1).toUpperCase();
     final distance = place.distanceMeters;
-    final price = '\$' * profile.priceLevel;
 
     return DecoratedBox(
       decoration: BoxDecoration(gradient: gradient),
@@ -120,10 +116,6 @@ class PlaceProfileHero extends StatelessWidget {
                       icon: CategoryInfo.icon(place.category),
                       label: CategoryInfo.label(l10n, place.category),
                     ),
-                    _ProfileChip(
-                      label: price,
-                      semanticLabel: '${l10n.labelPrice}: $price',
-                    ),
                     if (status != null) _StatusChip(status: status!),
                     if (distance != null)
                       _ProfileChip(
@@ -132,8 +124,6 @@ class PlaceProfileHero extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                RatingBadge(place: place, onDark: true),
               ],
             ),
           ),
@@ -144,44 +134,40 @@ class PlaceProfileHero extends StatelessWidget {
 }
 
 class _ProfileChip extends StatelessWidget {
-  const _ProfileChip({required this.label, this.icon, this.semanticLabel});
+  const _ProfileChip({required this.label, this.icon});
 
   final String label;
   final IconData? icon;
-  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Semantics(
-      label: semanticLabel,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.16),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, size: 14, color: Colors.white),
-              const SizedBox(width: 5),
-            ],
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 14, color: Colors.white),
+            const SizedBox(width: 5),
+          ],
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

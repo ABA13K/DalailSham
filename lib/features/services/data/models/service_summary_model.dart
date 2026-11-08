@@ -6,11 +6,13 @@ class ServiceSummaryModel extends ServiceSummary {
   const ServiceSummaryModel({
     required super.id,
     required super.name,
+    super.slug,
     super.regionName,
     super.categoryName,
     super.address,
     super.rating,
     super.reviewsCount,
+    super.isFavorited,
     super.distanceText,
     super.imageUrl,
   });
@@ -25,11 +27,13 @@ class ServiceSummaryModel extends ServiceSummary {
     return ServiceSummaryModel(
       id: id.toInt(),
       name: name.trim(),
+      slug: _text(json['slug']),
       regionName: _nestedName(json['region']),
       categoryName: _nestedName(json['category']),
       address: _text(json['address']),
       rating: (json['rating'] as num?)?.toDouble() ?? 0,
       reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? 0,
+      isFavorited: json['is_favorited'] == true,
       distanceText: _text(json['distance_text']),
       imageUrl: normalizeRemoteImageUrl(json['main_image']),
     );

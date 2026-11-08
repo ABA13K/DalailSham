@@ -75,10 +75,7 @@ class AllRegionsCubit extends Cubit<AllRegionsState> {
       (failure) {
         if (replace) {
           emit(
-            AllRegionsState(
-              status: AllRegionsStatus.failure,
-              failure: failure,
-            ),
+            AllRegionsState(status: AllRegionsStatus.failure, failure: failure),
           );
         } else {
           emit(state.copyWith(isLoadingMore: false));

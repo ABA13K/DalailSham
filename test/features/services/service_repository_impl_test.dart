@@ -6,6 +6,7 @@ import 'package:dali_alsham/features/services/data/models/service_summary_model.
 import 'package:dali_alsham/features/services/data/repositories/service_repository_impl.dart';
 import 'package:dali_alsham/features/services/domain/entities/service_page.dart';
 import 'package:dali_alsham/features/services/domain/entities/service_scope.dart';
+import 'package:dali_alsham/features/services/domain/entities/service_search_query.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -16,7 +17,12 @@ void main() {
   late _MockServiceRemoteDataSource remote;
   late ServiceRepositoryImpl repository;
 
-  setUpAll(() => registerFallbackValue(ServiceScope.category));
+  setUpAll(() {
+    registerFallbackValue(ServiceScope.category);
+    registerFallbackValue(
+      const ServiceSearchQuery(text: 'الاسد', locale: 'ar'),
+    );
+  });
 
   setUp(() {
     remote = _MockServiceRemoteDataSource();
@@ -32,6 +38,7 @@ void main() {
         page: any(named: 'page'),
         userLat: any(named: 'userLat'),
         userLng: any(named: 'userLng'),
+        authenticated: any(named: 'authenticated'),
       ),
     ).thenAnswer((_) async => const ServicePage(services: [], hasMore: false));
   }
@@ -46,6 +53,7 @@ void main() {
       page: 3,
       userLat: 33.51,
       userLng: 36.29,
+      authenticated: true,
     );
 
     verify(
@@ -56,17 +64,19 @@ void main() {
         page: 3,
         userLat: 33.51,
         userLng: 36.29,
+        authenticated: true,
       ),
     ).called(1);
   });
 
-  test('defaults to the first page without a location', () async {
+  test('forwards the first page without a location', () async {
     stubFetch();
 
     await repository.getServices(
       scope: ServiceScope.category,
       scopeId: 1,
       locale: 'en',
+      page: 1,
     );
 
     verify(
@@ -77,6 +87,7 @@ void main() {
         page: 1,
         userLat: null,
         userLng: null,
+        authenticated: false,
       ),
     ).called(1);
   });
@@ -90,6 +101,7 @@ void main() {
         page: any(named: 'page'),
         userLat: any(named: 'userLat'),
         userLng: any(named: 'userLng'),
+        authenticated: any(named: 'authenticated'),
       ),
     ).thenThrow(const NetworkException());
 
@@ -97,6 +109,7 @@ void main() {
       scope: ServiceScope.category,
       scopeId: 1,
       locale: 'en',
+      page: 1,
     );
 
     expect(result, isA<FailureResult<ServicePage>>());
@@ -127,4 +140,38 @@ void main() {
     expect(service.distanceText, isNull);
     expect(service.imageUrl, isNull);
   });
+
+  test('hands the search query to the datasource unchanged', () async {
+    const query = ServiceSearchQuery(
+      text: 'الاسد',
+      locale: 'ar',
+      categoryId: 1,
+      minRating: 4,
+    );
+    when(
+      () => remote.search(query),
+    ).thenAnswer((_) async => const ServicePage(services: [], hasMore: false));
+
+    final result = await repository.search(query);
+
+    expect(result, isA<Success<ServicePage>>());
+    verify(() => remote.search(query)).called(1);
+  });
+
+  test(
+    'a search that will not arrive is a failure, not an empty list',
+    () async {
+      when(() => remote.search(any())).thenThrow(const TimeoutException());
+
+      final result = await repository.search(
+        const ServiceSearchQuery(text: 'الاسد', locale: 'ar'),
+      );
+
+      expect(result, isA<FailureResult<ServicePage>>());
+      expect(
+        (result as FailureResult<ServicePage>).failure,
+        isA<TimeoutFailure>(),
+      );
+    },
+  );
 }

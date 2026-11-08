@@ -382,67 +382,68 @@ class _StorySlide extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 24, 28),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _CategoryPill(place: place),
-                    const SizedBox(height: 14),
-                    Text(
-                      name,
-                      style: theme.textTheme.headlineLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        height: 1.08,
-                      ),
-                    ),
-                    if (place.address != null) ...[
-                      const SizedBox(height: 8),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _CategoryPill(place: place),
+                      const SizedBox(height: 14),
                       Text(
-                        place.address!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white70,
+                        name,
+                        style: theme.textTheme.headlineLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          height: 1.08,
                         ),
+                      ),
+                      if (place.address != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          place.address!,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 18),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          if (place.distanceMeters != null)
+                            _InfoChip(
+                              icon: Icons.near_me_rounded,
+                              label: formatDistance(
+                                l10n,
+                                place.distanceMeters!,
+                              ),
+                            ),
+                          if (place.openingHours != null)
+                            _InfoChip(
+                              icon: Icons.schedule_rounded,
+                              label: place.openingHours!,
+                              ltrText: true,
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 26),
+                      FilledButton.icon(
+                        key: const ValueKey('story-open-place'),
+                        onPressed: onOpenPlace,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: theme.colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 14,
+                          ),
+                          shape: const StadiumBorder(),
+                        ),
+                        icon: const Icon(Icons.arrow_forward_rounded),
+                        label: Text(l10n.viewPlace),
                       ),
                     ],
-                    const SizedBox(height: 18),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _InfoChip(
-                          icon: Icons.star_rounded,
-                          label: place.rating.toStringAsFixed(1),
-                        ),
-                        if (place.distanceMeters != null)
-                          _InfoChip(
-                            icon: Icons.near_me_rounded,
-                            label: formatDistance(l10n, place.distanceMeters!),
-                          ),
-                        if (place.openingHours != null)
-                          _InfoChip(
-                            icon: Icons.schedule_rounded,
-                            label: place.openingHours!,
-                            ltrText: true,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 26),
-                    FilledButton.icon(
-                      onPressed: onOpenPlace,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: theme.colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 14,
-                        ),
-                        shape: const StadiumBorder(),
-                      ),
-                      icon: const Icon(Icons.arrow_forward_rounded),
-                      label: Text(l10n.viewPlace),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -536,12 +537,16 @@ class _InfoChip extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: Colors.white70),
           const SizedBox(width: 5),
-          Text(
-            label,
-            textDirection: ltrText ? TextDirection.ltr : null,
-            style: Theme.of(
-              context,
-            ).textTheme.labelMedium?.copyWith(color: Colors.white),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textDirection: ltrText ? TextDirection.ltr : null,
+              style: Theme.of(
+                context,
+              ).textTheme.labelMedium?.copyWith(color: Colors.white),
+            ),
           ),
         ],
       ),

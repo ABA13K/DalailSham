@@ -4,39 +4,22 @@ import 'package:dali_alsham/features/chat/domain/entities/chat_message.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('seeds the demo conversation once per place', () async {
+  test('a room starts empty in every locale', () async {
     final repository = LocalChatRepository();
 
-    final first = await repository.getMessages(
+    final english = await repository.getMessages(
       placeId: 'node/1',
       placeName: 'Nawfara Cafe',
       locale: 'en',
     );
-    final messages = (first as Success<List<ChatMessage>>).value;
-    expect(messages, hasLength(4));
-    expect(messages.first.text, contains('Nawfara Cafe'));
+    expect((english as Success<List<ChatMessage>>).value, isEmpty);
 
-    // A later read must not re-seed, even with different inputs.
-    final again = await repository.getMessages(
-      placeId: 'node/1',
-      placeName: 'Ignored',
-      locale: 'ar',
-    );
-    expect((again as Success<List<ChatMessage>>).value, hasLength(4));
-  });
-
-  test('arabic locale seeds an arabic conversation', () async {
-    final repository = LocalChatRepository();
-
-    final result = await repository.getMessages(
+    final arabic = await repository.getMessages(
       placeId: 'node/2',
       placeName: 'مقهى النوفرة',
       locale: 'ar',
     );
-
-    final messages = (result as Success<List<ChatMessage>>).value;
-    expect(messages.first.text, contains('مفتوح'));
-    expect(messages.first.text, contains('مقهى النوفرة'));
+    expect((arabic as Success<List<ChatMessage>>).value, isEmpty);
   });
 
   test('appends sent messages to the room', () async {
@@ -61,7 +44,7 @@ void main() {
       locale: 'en',
     );
     final messages = (room as Success<List<ChatMessage>>).value;
-    expect(messages, hasLength(5));
+    expect(messages, hasLength(1));
     expect(messages.last.text, 'What time do you close?');
   });
 
@@ -80,6 +63,6 @@ void main() {
       locale: 'en',
     );
 
-    expect((other as Success<List<ChatMessage>>).value, hasLength(4));
+    expect((other as Success<List<ChatMessage>>).value, isEmpty);
   });
 }

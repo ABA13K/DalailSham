@@ -7,17 +7,22 @@ import 'package:dali_alsham/features/services/domain/repositories/service_reposi
 class ServicePageParams {
   const ServicePageParams({
     required this.scope,
-    required this.scopeId,
     required this.locale,
     this.page = 1,
+    this.authenticated = false,
+    this.scopeId,
     this.userLat,
     this.userLng,
   });
 
   final ServiceScope scope;
-  final int scopeId;
   final String locale;
   final int page;
+
+  /// Whether a bearer token is stored, which selects the signed-in variant of
+  /// the listings that publish one.
+  final bool authenticated;
+  final int? scopeId;
   final double? userLat;
   final double? userLng;
 }
@@ -34,6 +39,7 @@ class GetServicePage implements UseCase<ServicePage, ServicePageParams> {
         scopeId: params.scopeId,
         locale: params.locale,
         page: params.page,
+        authenticated: params.authenticated,
         userLat: params.userLat,
         userLng: params.userLng,
       );

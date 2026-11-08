@@ -27,7 +27,7 @@ class PlaceDetailsPage extends StatelessWidget {
 
   final Place place;
 
-  /// Every place currently ships with a generated story.
+  /// The story viewer reads the listing's own name, photo and hours.
   final bool hasStory;
 
   @override
@@ -61,7 +61,6 @@ class PlaceDetailsPage extends StatelessWidget {
               collapseMode: CollapseMode.parallax,
               background: PlaceProfileHero(
                 place: place,
-                profile: profile,
                 status: profile.openingStatus,
                 hasStory: hasStory,
                 onAvatarTap: () => _showAvatarOptions(context),
@@ -94,7 +93,7 @@ class PlaceDetailsPage extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 22),
-                    PlaceProfileBody(place: place, profile: profile),
+                    PlaceProfileBody(place: place),
                   ],
                 ),
               ),

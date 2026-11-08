@@ -8,10 +8,7 @@ import '../models/region_model.dart';
 abstract interface class RegionRemoteDataSource {
   Future<List<RegionModel>> fetchRandomRegions({required String locale});
 
-  Future<RegionPage> fetchRegions({
-    required String locale,
-    required int page,
-  });
+  Future<RegionPage> fetchRegions({required String locale, required int page});
 }
 
 /// Remote data source backed by the Dali Alsham regions API.

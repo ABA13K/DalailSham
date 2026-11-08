@@ -27,23 +27,3 @@ class PlacesRequested extends PlacesEvent {
 class PlacesRefreshed extends PlacesEvent {
   const PlacesRefreshed();
 }
-
-/// Applies a client-side category filter (`null` = all).
-class PlaceCategoryFiltered extends PlacesEvent {
-  const PlaceCategoryFiltered(this.category);
-
-  final PlaceCategory? category;
-
-  @override
-  List<Object?> get props => [category];
-}
-
-/// Applies a client-side text query.
-class PlaceSearchQueryChanged extends PlacesEvent {
-  const PlaceSearchQueryChanged(this.query);
-
-  final String query;
-
-  @override
-  List<Object?> get props => [query];
-}

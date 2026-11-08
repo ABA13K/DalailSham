@@ -14,9 +14,14 @@ class LocaleCubit extends Cubit<Locale> {
     emit(Locale(code ?? 'ar'));
   }
 
-  Future<void> toggle() async {
-    final next = state.languageCode == 'ar' ? 'en' : 'ar';
-    emit(Locale(next));
-    await _repository.saveLocaleCode(next);
+  Future<void> toggle() async =>
+      apply(state.languageCode == 'ar' ? 'en' : 'ar');
+
+  /// Switches to [code] — the drawer's language row and the language an
+  /// account was created with both land here.
+  Future<void> apply(String code) async {
+    if (code == state.languageCode) return;
+    emit(Locale(code));
+    await _repository.saveLocaleCode(code);
   }
 }

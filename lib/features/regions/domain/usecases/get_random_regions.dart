@@ -17,8 +17,5 @@ class GetRandomRegions implements UseCase<List<Region>, RandomRegionsParams> {
 
   @override
   Future<Result<List<Region>>> call(RandomRegionsParams params) =>
-      _repository.getRandomRegions(
-        locale: params.locale,
-        limit: params.limit,
-      );
+      _repository.getRandomRegions(locale: params.locale, limit: params.limit);
 }

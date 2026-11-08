@@ -51,7 +51,6 @@ void main() {
 
     expect(result.isSuccess, isTrue);
     final nearby = result.getOrElse((_) => const NearbyPlaces(places: []));
-    expect(nearby.isDemo, isFalse);
     expect(nearby.places.first.name, 'Near Cafe');
     expect(nearby.places.last.name, 'Far Cafe');
     expect(nearby.places.first.distanceMeters, isNotNull);
@@ -61,7 +60,7 @@ void main() {
     );
   });
 
-  test('falls back to nearby demo places when the API fails', () async {
+  test('reports the network failure when the API fails', () async {
     when(
       () => remote.fetchNearbyPlaces(
         latitude: any(named: 'latitude'),
@@ -75,24 +74,15 @@ void main() {
       longitude: 36.29,
     );
 
-    expect(result.isSuccess, isTrue);
-    final nearby = result.getOrElse((_) => const NearbyPlaces(places: []));
-    expect(nearby.isDemo, isTrue);
-    expect(nearby.places, isNotEmpty);
-    expect(nearby.places.first.name, 'Nawfara Cafe');
-    expect(nearby.places.first.address, isNotNull);
-    expect(nearby.places.first.phone, isNull);
-    expect(
-      nearby.places.every((place) => place.distanceMeters != null),
-      isTrue,
-    );
-    expect(
-      nearby.places.first.distanceMeters!,
-      lessThan(nearby.places.last.distanceMeters!),
-    );
+    expect(result, isA<FailureResult<NearbyPlaces>>());
+    final failure = switch (result) {
+      FailureResult<NearbyPlaces>(:final failure) => failure,
+      _ => throw StateError('expected failure'),
+    };
+    expect(failure, isA<NetworkFailure>());
   });
 
-  test('does not mask unexpected errors with demo data', () async {
+  test('surfaces unexpected errors as failures', () async {
     when(
       () => remote.fetchNearbyPlaces(
         latitude: any(named: 'latitude'),

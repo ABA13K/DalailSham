@@ -7,10 +7,7 @@ import '../../domain/repositories/chat_repository.dart';
 enum ChatStatus { initial, loading, ready, failure }
 
 class ChatState extends Equatable {
-  const ChatState({
-    this.status = ChatStatus.initial,
-    this.messages = const [],
-  });
+  const ChatState({this.status = ChatStatus.initial, this.messages = const []});
 
   final ChatStatus status;
   final List<ChatMessage> messages;
@@ -47,9 +44,8 @@ class ChatCubit extends Cubit<ChatState> {
     if (isClosed) return;
     result.fold(
       (failure) => emit(const ChatState(status: ChatStatus.failure)),
-      (messages) => emit(
-        ChatState(status: ChatStatus.ready, messages: messages),
-      ),
+      (messages) =>
+          emit(ChatState(status: ChatStatus.ready, messages: messages)),
     );
   }
 
@@ -63,8 +59,7 @@ class ChatCubit extends Cubit<ChatState> {
     if (isClosed) return;
     result.fold(
       (failure) {},
-      (message) =>
-          emit(state.copyWith(messages: [...state.messages, message])),
+      (message) => emit(state.copyWith(messages: [...state.messages, message])),
     );
   }
 }
