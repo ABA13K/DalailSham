@@ -180,7 +180,7 @@ void main() {
     );
   });
 
-  Future<void> pumpProfile(WidgetTester tester) async {
+  Future<void> pumpProfile(WidgetTester tester, {String locale = 'en'}) async {
     final tokenCubit = TokenCubit(getIt<TokenRepository>());
     await tokenCubit.load();
     final locationCubit = LocationCubit(
@@ -200,7 +200,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
-          locale: const Locale('en'),
+          locale: Locale(locale),
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: const ServiceProfilePage(slug: 'amran'),
@@ -222,6 +222,13 @@ void main() {
     expect(find.text('10:00 – 22:00'), findsOneWidget);
     expect(find.text('مكان صلاة111'), findsOneWidget);
     expect(find.text('0999111222'), findsOneWidget);
+  });
+
+  testWidgets('the Arabic screen shows the comments too', (tester) async {
+    await pumpProfile(tester, locale: 'ar');
+
+    expect(find.text('رائع جدا'), findsOneWidget);
+    expect(find.text('عمران ابراهيم'), findsWidgets);
   });
 
   testWidgets('the heart toggles the service by its slug', (tester) async {

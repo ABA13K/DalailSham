@@ -50,11 +50,12 @@ class ApiConstants {
   static String serviceCategoryProductsPath(String slug, String categorySlug) =>
       '${serviceProductCategoriesPath(slug)}/${Uri.encodeComponent(categorySlug)}/products';
 
-  // The signed-in reviews path is spelled without a slash by the backend.
+  // The signed-in reviews live under the same `/user/services` prefix as the
+  // signed-in details; only the public reading is under `/services`.
   static String serviceReviewsPath(String slug) =>
       '${serviceDetailPath(slug)}/reviews';
   static String userServiceReviewsPath(String slug) =>
-      '$dalilBaseUrl/userservices/${Uri.encodeComponent(slug)}/reviews';
+      '$dalilBaseUrl/user/services/${Uri.encodeComponent(slug)}/reviews';
 
   static const String authRegisterPath = '$dalilBaseUrl/auth/register';
   static const String authLoginPath = '$dalilBaseUrl/auth/login';
