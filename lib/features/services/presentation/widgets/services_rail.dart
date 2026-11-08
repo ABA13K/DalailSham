@@ -4,6 +4,7 @@ import '../../../../core/widgets/shimmer.dart';
 import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../domain/entities/service_summary.dart';
 import '../cubit/services_cubit.dart';
+import '../open_service_profile.dart';
 
 /// Showcase of a short services listing on the home feed, styled as a vertical
 /// stack of horizontal cards matching the "الأماكن الأعلى تقييماً" design.
@@ -111,193 +112,198 @@ class _ServiceTile extends StatelessWidget {
     final scheme = theme.colorScheme;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
-    final locationLabel = [
-      service.regionName,
-      service.categoryName,
-    ].whereType<String>().where((s) => s.trim().isNotEmpty).join(
-      isArabic ? '، ' : ' · ',
-    );
+    final locationLabel = [service.regionName, service.categoryName]
+        .whereType<String>()
+        .where((s) => s.trim().isNotEmpty)
+        .join(isArabic ? '، ' : ' · ');
 
     final rawDistance = service.distanceText?.trim();
     final distanceSentence = rawDistance == null || rawDistance.isEmpty
         ? null
         : (isArabic && !rawDistance.startsWith('يبعد')
-            ? 'يبعد $rawDistance عن موقعك الحالي'
-            : rawDistance);
+              ? 'يبعد $rawDistance عن موقعك الحالي'
+              : rawDistance);
 
-    final reviewLabel =
-        service.reviewsCount > 0 ? '(${service.reviewsCount}+)' : '(25+)';
+    final reviewLabel = service.reviewsCount > 0
+        ? '(${service.reviewsCount}+)'
+        : '(25+)';
 
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.55),
-          width: 1,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => openServiceProfile(context, service),
+      child: Container(
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: scheme.outlineVariant.withValues(alpha: 0.55),
+            width: 1,
+          ),
         ),
-      ),
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Start side (Right in RTL): Rounded image with rating pill & heart button
-          SizedBox(
-            width: ServicesRail.imageWidth,
-            height: double.infinity,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  _TileImage(url: service.imageUrl),
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    right: 8,
-                    child: Directionality(
-                      textDirection: TextDirection.ltr,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Rating pill: ★ 4.5 (25+)
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 3.5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.45),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.star_rounded,
-                                    size: 13,
-                                    color: Color(0xFFFFC107),
-                                  ),
-                                  const SizedBox(width: 2.5),
-                                  Text(
-                                    service.rating.toStringAsFixed(1),
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 10.5,
-                                      height: 1.1,
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Start side (Right in RTL): Rounded image with rating pill & heart button
+            SizedBox(
+              width: ServicesRail.imageWidth,
+              height: double.infinity,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _TileImage(url: service.imageUrl),
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      right: 8,
+                      child: Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Rating pill: ★ 4.5 (25+)
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 3.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.45),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.star_rounded,
+                                      size: 13,
+                                      color: Color(0xFFFFC107),
                                     ),
-                                  ),
-                                  const SizedBox(width: 2.5),
-                                  Flexible(
-                                    child: Text(
-                                      reviewLabel,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.85,
-                                        ),
-                                        fontSize: 9.5,
-                                        height: 1.1,
+                                    const SizedBox(width: 2.5),
+                                    Text(
+                                      service.rating.toStringAsFixed(1),
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 10.5,
+                                            height: 1.1,
+                                          ),
+                                    ),
+                                    const SizedBox(width: 2.5),
+                                    Flexible(
+                                      child: Text(
+                                        reviewLabel,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                              color: Colors.white.withValues(
+                                                alpha: 0.85,
+                                              ),
+                                              fontSize: 9.5,
+                                              height: 1.1,
+                                            ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
 
-                          // Favorite heart overlay
-                          Container(
-                            width: 26,
-                            height: 26,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.black.withValues(alpha: 0.38),
-                            ),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: IconTheme(
-                                data: const IconThemeData(
-                                  color: Colors.white,
-                                  size: 16,
+                            // Favorite heart overlay
+                            Container(
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withValues(alpha: 0.38),
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: IconTheme(
+                                  data: const IconThemeData(
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  child: FavoriteButton(service: service),
                                 ),
-                                child: FavoriteButton(service: service),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // End side (Left in RTL): Distance, Title, Location pin
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (distanceSentence != null) ...[
+                      Text(
+                        distanceSentence,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                    Text(
+                      service.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
+                    if (locationLabel.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.location_on_rounded,
+                            size: 15,
+                            color: scheme.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              locationLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurface,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ],
+                    ],
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-
-          // End side (Left in RTL): Distance, Title, Location pin
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (distanceSentence != null) ...[
-                    Text(
-                      distanceSentence,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        fontSize: 11,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                  ],
-                  Text(
-                    service.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 15,
-                    ),
-                  ),
-                  if (locationLabel.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.location_on_rounded,
-                          size: 15,
-                          color: scheme.primary,
-                        ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            locationLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: scheme.onSurface,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

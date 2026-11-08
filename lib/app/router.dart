@@ -13,6 +13,7 @@ import '../features/places/presentation/pages/stories_page.dart';
 import '../features/profile/presentation/pages/change_password_page.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/regions/presentation/pages/regions_page.dart';
+import '../features/service_profile/presentation/pages/service_profile_page.dart';
 import '../features/services/presentation/pages/services_page.dart';
 import '../features/services/presentation/pages/services_search_page.dart';
 import '../features/stories/presentation/pages/service_story_list_page.dart';
@@ -143,6 +144,14 @@ GoRouter createRouter({required OnboardingRepository onboarding}) => GoRouter(
       path: '/regions',
       name: 'regions',
       builder: (context, state) => const RegionsPage(),
+    ),
+    GoRoute(
+      path: '/service/:slug',
+      name: 'service-profile',
+      builder: (context, state) => ServiceProfilePage(
+        slug: state.pathParameters['slug']!,
+        initialName: state.uri.queryParameters['name'],
+      ),
     ),
     GoRoute(
       path: '/services',
